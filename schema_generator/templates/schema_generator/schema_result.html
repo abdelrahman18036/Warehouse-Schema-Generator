@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Warehouse Schema</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .schema-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+      .table-container {
+        width: 45%;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Generated Data Warehouse Schema</h1>
+    <div class="schema-container">
+        <div class="table-container">
+            <h2>Fact Tables</h2>
+            {% for table_name, table_info in schema.fact_tables.items %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="3">{{ table_name }}</th>
+                        </tr>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraints</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for column in table_info.columns %}
+                            <tr>
+                                <td>{{ column.name }}</td>
+                                <td>{{ column.type }}</td>
+                                <td>
+                                    {% if column.name in table_info.primary_keys %}
+                                        PRIMARY KEY<br>
+                                    {% endif %}
+                                    {% for fk in table_info.foreign_keys %}
+                                        {% if fk.column == column.name %}
+                                            FOREIGN KEY REFERENCES {{ fk.references.table }}({{ fk.references.column }})<br>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+
+        <div class="table-container">
+            <h2>Dimension Tables</h2>
+            {% for table_name, table_info in schema.dimension_tables.items %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="3">{{ table_name }}</th>
+                        </tr>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraints</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for column in table_info.columns %}
+                            <tr>
+                                <td>{{ column.name }}</td>
+                                <td>{{ column.type }}</td>
+                                <td>
+                                    {% if column.name in table_info.primary_keys %}
+                                        PRIMARY KEY<br>
+                                    {% endif %}
+                                    {% for fk in table_info.foreign_keys %}
+                                        {% if fk.column == column.name %}
+                                            FOREIGN KEY REFERENCES {{ fk.references.table }}({{ fk.references.column }})<br>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
