@@ -1,56 +1,90 @@
+<!-- schema_generator/templates/schema_generator/schema_result.html -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Warehouse Schema</title>
+<head>
+    <meta charset="UTF-8">
+    <title>Generated Data Warehouse Schema</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-      .schema-container {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 20px;
-      }
-      .table-container {
-        width: 45%;
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-      }
-      h2 {
-        text-align: center;
-        color: #333;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 10px 0;
-      }
-      table,
-      th,
-      td {
-        border: 1px solid #ddd;
-      }
-      th,
-      td {
-        padding: 8px;
-        text-align: left;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
+        /* Dark theme styles */
+        body {
+            background-color: #2e3440;
+            color: #d8dee9;
+        }
+        .table-container {
+            background-color: #3b4252;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #eceff4;
+        }
+        table {
+            background-color: #434c5e;
+            color: #d8dee9;
+        }
+        th {
+            background-color: #4c566a;
+        }
+        a {
+            color: #88c0d0;
+        }
     </style>
-  </head>
-  <body>
-    <h1>Generated Data Warehouse Schema</h1>
-    <div class="schema-container">
+</head>
+<body>
+    <div class="container">
+        <h1>Generated Data Warehouse Schema</h1>
+        <h2>Detected Domain: {{ domain }}</h2>
+
+        <!-- Display Missing Tables -->
+        
+        {% if missing_tables %}
+            <div class="alert alert-warning">
+                <strong>Missing Tables:</strong>
+                <ul>
+                    {% for table in missing_tables %}
+                        <li>{{ table }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if missing_columns %}
+            <div class="alert alert-warning">
+                <strong>Missing Columns:</strong>
+                {% for table_name, columns in missing_columns.items %}
+                    <p>In table <strong>{{ table_name }}</strong>:</p>
+                    <ul>
+                        {% for column in columns %}
+                            <li>{{ column }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Display Missing Columns -->
+        {% if missing_columns %}
+            <div class="alert alert-warning">
+                <strong>Missing Columns:</strong>
+                {% for table, columns in missing_columns.items %}
+                    <p>In table <strong>{{ table }}</strong>:</p>
+                    <ul>
+                        {% for column in columns %}
+                            <li>{{ column }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Fact Tables -->
         <div class="table-container">
             <h2>Fact Tables</h2>
             {% for table_name, table_info in schema.fact_tables.items %}
-                <table>
+                <table class="table table-dark table-striped">
                     <thead>
                         <tr>
                             <th colspan="3">{{ table_name }}</th>
@@ -83,10 +117,11 @@
             {% endfor %}
         </div>
 
+        <!-- Dimension Tables -->
         <div class="table-container">
             <h2>Dimension Tables</h2>
             {% for table_name, table_info in schema.dimension_tables.items %}
-                <table>
+                <table class="table table-dark table-striped">
                     <thead>
                         <tr>
                             <th colspan="3">{{ table_name }}</th>
@@ -119,5 +154,7 @@
             {% endfor %}
         </div>
     </div>
+    <!-- Include Bootstrap JS (Optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 </body>
 </html>
