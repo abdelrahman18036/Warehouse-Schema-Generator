@@ -1,4 +1,7 @@
+# utils/schema_parsing.py
+
 import re
+
 def parse_sql_file(file_path):
     with open(file_path, 'r') as file:
         sql_content = file.read()

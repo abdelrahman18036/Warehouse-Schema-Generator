@@ -1,5 +1,15 @@
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Upload Schema</button>
-</form>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Schema</title>
+</head>
+<body>
+    <h1>Upload Database Schema</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
