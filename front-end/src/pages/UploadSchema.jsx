@@ -1,4 +1,4 @@
-// src/pages/UploadSchema.jsx
+// src/pages/UploadSchema.jsx (No changes needed, included for completeness)
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -14,6 +14,10 @@ const UploadSchema = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!schemaFile) {
+            setError({ message: 'Please select a schema file to upload.' });
+            return;
+        }
         const formData = new FormData();
         formData.append('name', name);
         formData.append('schema_file', schemaFile);
@@ -29,7 +33,7 @@ const UploadSchema = () => {
             const { id } = response.data;
             navigate(`/result/${id}`); // Redirect to the result page with the ID
         } catch (err) {
-            setError(err.response ? err.response.data : 'Error uploading schema');
+            setError(err.response ? err.response.data : { message: 'Error uploading schema' });
         }
     };
 
@@ -75,7 +79,9 @@ const UploadSchema = () => {
                             <option>Social Media</option>
                         </select>
                     </div>
-                    <button type="submit" className="w-full bg-titanite text-white px-4 py-2 rounded hover:bg-titanite-dark transition">Upload</button>
+                    <button type="submit" className="w-full bg-titanite text-white px-4 py-2 rounded hover:bg-titanite-dark transition">
+                        Upload
+                    </button>
                 </form>
                 {error && (
                     <div className="mt-4 p-4 bg-red-700 border border-red-500 rounded">
