@@ -1,0 +1,17 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for dark mode */
+body.dark {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Add to your CSS to ensure ReactFlow has a size */
+.reactflow-wrapper {
+    width: 100%;
+    height: 800px;
+    /* Adjust as necessary */
+}

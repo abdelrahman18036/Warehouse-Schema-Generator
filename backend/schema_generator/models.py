@@ -1,7 +1,0 @@
-from django.db import models
-
-class UserDatabase(models.Model):
-    name = models.CharField(max_length=255)
-    schema_file = models.FileField(upload_to='schemas/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    domain = models.CharField(max_length=50, default='General')
