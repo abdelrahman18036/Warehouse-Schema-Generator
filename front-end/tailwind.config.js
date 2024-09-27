@@ -7,7 +7,7 @@ export default {
     extend: {
       colors: {
         titanite: {
-          DEFAULT: "#0f766e", // Green Titanite color
+          DEFAULT: "rgb(45 212 191)", // Green Titanite color
           light: "#2dd4bf",
           dark: "#0d9488",
         },

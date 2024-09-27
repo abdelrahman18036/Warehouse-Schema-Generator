@@ -1,15 +1,19 @@
-// src/pages/UploadSchema.jsx (No changes needed, included for completeness)
+// src/pages/UploadSchema.jsx
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import Layout from '../components/Layout';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import PreloadOverlay from '../components/PreloadOverlay';
 
 const UploadSchema = () => {
     const [name, setName] = useState('');
     const [schemaFile, setSchemaFile] = useState(null);
     const [domain, setDomain] = useState('Auto-detect');
     const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [cancelTokenSource, setCancelTokenSource] = useState(null);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -18,57 +22,112 @@ const UploadSchema = () => {
             setError({ message: 'Please select a schema file to upload.' });
             return;
         }
+
+        setIsLoading(true);
+        setCurrentStep(1); // Start with 'Uploading'
+
         const formData = new FormData();
         formData.append('name', name);
         formData.append('schema_file', schemaFile);
         formData.append('domain', domain);
 
+        const source = axios.CancelToken.source();
+        setCancelTokenSource(source);
+
         try {
-            const response = await axios.post('http://localhost:8000/api/schema/upload/', formData, {
+            // Step 1: Uploading
+            const uploadRes = await axios.post('http://localhost:8000/api/schema/upload/', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
+                cancelToken: source.token,
+                onUploadProgress: (progressEvent) => {
+                    // Optional: Implement progress tracking
+                },
             });
-            setError(null);
-            const { id } = response.data;
+            setCurrentStep(2); // Move to 'Analyzing'
+
+            // Simulate Analysis Delay
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            setCurrentStep(3); // Move to 'Enhancing'
+
+            // Simulate Enhancing Delay
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            setCurrentStep(4); // Move to 'Upgrading'
+
+            // Simulate Upgrading Delay
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            setIsLoading(false);
+            const { id } = uploadRes.data;
             navigate(`/result/${id}`); // Redirect to the result page with the ID
         } catch (err) {
-            setError(err.response ? err.response.data : { message: 'Error uploading schema' });
+            if (axios.isCancel(err)) {
+                console.log('Upload canceled by user');
+            } else {
+                console.error('Error uploading schema:', err);
+                setError(err.response ? err.response.data : { message: 'Error uploading schema' });
+            }
+            setIsLoading(false);
+            setCurrentStep(0);
+        }
+    };
+
+    const handleCancel = () => {
+        if (cancelTokenSource) {
+            cancelTokenSource.cancel('User canceled the upload.');
+            setIsLoading(false);
+            setCurrentStep(0);
         }
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-background text-white">
-            <Navbar />
-            <main className="flex-grow container mx-auto p-4">
-                <h2 className="text-3xl font-bold mb-4 text-titanite">Upload Database Schema</h2>
-                <form onSubmit={handleSubmit} className="max-w-md bg-surface p-6 rounded-lg shadow-lg">
+        <Layout>
+            <motion.div
+                className="flex flex-col items-center justify-center py-20"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <h2 className="text-4xl font-bold mb-8 text-titanite">Upload Database Schema</h2>
+                <motion.form
+                    onSubmit={handleSubmit}
+                    className="w-full max-w-md bg-surface p-8 rounded-lg shadow-lg"
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
                     <div className="mb-4">
                         <label className="block text-titanite-light mb-2">Name</label>
-                        <input
+                        <motion.input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-3 py-2 bg-surface border border-titanite rounded text-white"
+                            className="w-full px-3 py-2 bg-surface border border-titanite rounded text-white focus:outline-none focus:ring-2 focus:ring-titanite"
                             required
+                            whileFocus={{ scale: 1.02 }}
                         />
                     </div>
                     <div className="mb-4">
                         <label className="block text-titanite-light mb-2">Schema File</label>
-                        <input
+                        <motion.input
                             type="file"
                             accept=".sql"
                             onChange={(e) => setSchemaFile(e.target.files[0])}
                             className="w-full text-titanite-light"
                             required
+                            whileHover={{ scale: 1.02 }}
                         />
                     </div>
                     <div className="mb-4">
                         <label className="block text-titanite-light mb-2">Domain</label>
-                        <select
+                        <motion.select
                             value={domain}
                             onChange={(e) => setDomain(e.target.value)}
-                            className="w-full px-3 py-2 bg-surface border border-titanite rounded text-white"
+                            className="w-full px-3 py-2 bg-surface border border-titanite rounded text-white focus:outline-none focus:ring-2 focus:ring-titanite"
+                            whileHover={{ scale: 1.02 }}
                         >
                             <option>Auto-detect</option>
                             <option>E-commerce</option>
@@ -77,21 +136,36 @@ const UploadSchema = () => {
                             <option>Education</option>
                             <option>Supply Chain</option>
                             <option>Social Media</option>
-                        </select>
+                        </motion.select>
                     </div>
-                    <button type="submit" className="w-full bg-titanite text-white px-4 py-2 rounded hover:bg-titanite-dark transition">
+                    <motion.button
+                        type="submit"
+                        className="w-full bg-titanite text-white px-4 py-2 rounded hover:bg-titanite-dark transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={isLoading}
+                    >
                         Upload
-                    </button>
-                </form>
+                    </motion.button>
+                </motion.form>
                 {error && (
-                    <div className="mt-4 p-4 bg-red-700 border border-red-500 rounded">
-                        <pre className="whitespace-pre-wrap">{JSON.stringify(error, null, 2)}</pre>
-                    </div>
+                    <motion.div
+                        className="mt-4 p-4 bg-red-700 border border-red-500 rounded w-full max-w-md"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <pre className="whitespace-pre-wrap text-white">{JSON.stringify(error, null, 2)}</pre>
+                    </motion.div>
                 )}
-            </main>
-            <Footer />
-        </div>
-    )
-}
+            </motion.div>
+
+            {/* Preload Overlay */}
+            <AnimatePresence>
+                {isLoading && <PreloadOverlay currentStep={currentStep} onClose={handleCancel} />}
+            </AnimatePresence>
+        </Layout>
+    );
+};
 
 export default UploadSchema;

@@ -1,11 +1,11 @@
 // src/pages/SchemaResult.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import Layout from '../components/Layout';
 import SchemaGraph from '../components/SchemaGraph';
 import axios from 'axios';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { motion } from 'framer-motion';
 
 const SchemaResult = () => {
     const { id } = useParams();
@@ -42,7 +42,6 @@ const SchemaResult = () => {
                 setMissingTables(Array.isArray(metadataRes.data.missing_tables) ? metadataRes.data.missing_tables : []);
                 setMissingColumns(metadataRes.data.missing_columns || {});
                 setLoading(false);
-                console.log('SchemaResult: Fetched all schema data');
             } catch (err) {
                 console.error('Error fetching schema result:', err);
                 setError(err.response ? err.response.data : { message: 'Error fetching data' });
@@ -60,30 +59,49 @@ const SchemaResult = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
-            <Navbar />
-            <main className="flex-grow container mx-auto p-6">
-                <h2 className="text-4xl font-extrabold mb-6 text-teal-400">Schema Result</h2>
+        <Layout>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col items-center w-full px-4 py-8"
+            >
+                <h2 className="text-4xl font-extrabold mb-6 text-teal-400 text-center">
+                    Schema Result for "{domain}" Domain
+                </h2>
                 {loading && <p className="text-center text-lg">Loading...</p>}
                 {error && (
-                    <div className="mt-4 p-4 bg-red-700 border border-red-500 rounded">
+                    <motion.div
+                        className="mt-4 p-4 bg-red-700 border border-red-500 rounded w-full max-w-2xl"
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
                         <pre className="whitespace-pre-wrap text-white">{JSON.stringify(error, null, 2)}</pre>
-                    </div>
+                    </motion.div>
                 )}
                 {!loading && !error && (
                     <>
                         <ErrorBoundary>
-                            <div className="w-full h-[700px] mb-8 rounded-lg shadow-lg overflow-hidden">
+                            <motion.div
+                                className="w-full h-96 mb-8 rounded-lg shadow-lg overflow-hidden"
+                                initial={{ scale: 0.95, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ duration: 0.5 }}
+                            >
                                 <SchemaGraph data={combinedData} />
-                            </div>
+                            </motion.div>
                         </ErrorBoundary>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                                <h3 className="text-2xl font-semibold text-teal-300 mb-4">Domain</h3>
-                                <p className="text-lg">{domain}</p>
-                            </div>
-                            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* AI Suggestions */}
+                            <motion.div
+                                className="bg-gray-800 p-6 rounded-lg shadow-lg"
+                                initial={{ x: 50, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ duration: 0.5 }}
+                            >
                                 <h3 className="text-2xl font-semibold text-teal-300 mb-4">AI Suggestions</h3>
+                                {/* Missing Tables */}
                                 <div className="mb-4">
                                     <h4 className="text-xl font-semibold text-teal-200">Missing Tables:</h4>
                                     {Array.isArray(aiSuggestions?.missing_tables) && aiSuggestions.missing_tables.length > 0 ? (
@@ -100,6 +118,7 @@ const SchemaResult = () => {
                                         <p className="text-teal-100">No missing tables.</p>
                                     )}
                                 </div>
+                                {/* Missing Columns */}
                                 <div>
                                     <h4 className="text-xl font-semibold text-teal-200">Missing Columns:</h4>
                                     {Array.isArray(aiSuggestions?.missing_columns) && aiSuggestions.missing_columns.length > 0 ? (
@@ -127,56 +146,70 @@ const SchemaResult = () => {
                                         <p className="text-teal-100">No missing columns.</p>
                                     )}
                                 </div>
+                            </motion.div>
+                            {/* Combined Missing Tables and Columns */}
+                            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Missing Tables */}
+                                <motion.div
+                                    className="bg-gray-800 p-6 rounded-lg shadow-lg"
+                                    initial={{ y: 50, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <h3 className="text-2xl font-semibold text-teal-300 mb-4">Missing Tables</h3>
+                                    {Array.isArray(missingTables) && missingTables.length > 0 ? (
+                                        <ul className="list-disc list-inside ml-6">
+                                            {missingTables.map((table, index) => (
+                                                typeof table === 'string' ? (
+                                                    <li key={index}>{table}</li>
+                                                ) : (
+                                                    <li key={index}>Unknown Table</li>
+                                                )
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-teal-100">No missing tables.</p>
+                                    )}
+                                </motion.div>
+                                {/* Missing Columns */}
+                                <motion.div
+                                    className="bg-gray-800 p-6 rounded-lg shadow-lg"
+                                    initial={{ y: 50, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                >
+                                    <h3 className="text-2xl font-semibold text-teal-300 mb-4">Missing Columns</h3>
+                                    {missingColumns && Object.keys(missingColumns).length > 0 ? (
+                                        Object.keys(missingColumns).map((table, index) => (
+                                            <div key={index} className="mb-4">
+                                                <p className="font-medium">{table}:</p>
+                                                {Array.isArray(missingColumns[table]) && missingColumns[table].length > 0 ? (
+                                                    <ul className="list-disc list-inside ml-6">
+                                                        {missingColumns[table].map((col, idx) => (
+                                                            typeof col === 'string' ? (
+                                                                <li key={idx}>{col}</li>
+                                                            ) : (
+                                                                <li key={idx}>Unknown Column</li>
+                                                            )
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-teal-100">No missing columns.</p>
+                                                )}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-teal-100">No missing columns.</p>
+                                    )}
+                                </motion.div>
                             </div>
-                        </div>
-                        <div className="mt-8">
-                            <h3 className="text-2xl font-semibold text-teal-300 mb-4">Missing Tables</h3>
-                            {Array.isArray(missingTables) && missingTables.length > 0 ? (
-                                <ul className="list-disc list-inside ml-6">
-                                    {missingTables.map((table, index) => (
-                                        typeof table === 'string' ? (
-                                            <li key={index}>{table}</li>
-                                        ) : (
-                                            <li key={index}>Unknown Table</li>
-                                        )
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-teal-100">No missing tables.</p>
-                            )}
-                        </div>
-                        <div className="mt-6">
-                            <h3 className="text-2xl font-semibold text-teal-300 mb-4">Missing Columns</h3>
-                            {missingColumns && Object.keys(missingColumns).length > 0 ? (
-                                Object.keys(missingColumns).map((table, index) => (
-                                    <div key={index} className="mb-4">
-                                        <p className="font-medium">{table}:</p>
-                                        {Array.isArray(missingColumns[table]) && missingColumns[table].length > 0 ? (
-                                            <ul className="list-disc list-inside ml-6">
-                                                {missingColumns[table].map((col, idx) => (
-                                                    typeof col === 'string' ? (
-                                                        <li key={idx}>{col}</li>
-                                                    ) : (
-                                                        <li key={idx}>Unknown Column</li>
-                                                    )
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p className="text-teal-100">No missing columns.</p>
-                                        )}
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-teal-100">No missing columns.</p>
-                            )}
                         </div>
                     </>
                 )}
-            </main>
-            <Footer />
-        </div>
+            </motion.div>
+        </Layout>
     );
 
-}
+};
 
 export default SchemaResult;

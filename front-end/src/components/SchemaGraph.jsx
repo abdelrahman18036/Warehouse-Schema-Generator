@@ -134,7 +134,9 @@ const SchemaGraph = ({ data }) => {
     };
 
     const availableSchemas = Object.keys(data).filter(key =>
-        ['ai_enhanced_schema', 'original_schema', 'warehouse_schema'].includes(key)
+        ['ai_enhanced_schema', 'original_schema'].includes(key)
+        // ['ai_enhanced_schema', 'original_schema', 'warehouse_schema'].includes(key)
+
     );
 
     return (
