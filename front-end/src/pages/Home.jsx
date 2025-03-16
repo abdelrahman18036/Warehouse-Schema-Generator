@@ -9,7 +9,7 @@ import ScrollEffect from "../components/ScrollEffect";
 export default function Home() {
   return (
     <div>   
-      <div className="relative overflow-x-hidden pt-5">
+      <div className="relative overflow-x-hidden pt-5 h-screen">
         <div className="relative w-[80%] mx-auto px-4">
           {/* Header */}
           <Navbar />
@@ -87,7 +87,7 @@ export default function Home() {
           </main>
         </div>
       
-        <div className="p-5 bg-[#4361ee] text-white mt-10">
+        <div className="p-5 bg-[#4361ee] text-white mt-10 absolute bottom-0 w-full">
           <Marquee>
             <div className="flex items-center gap-8">
               {Array.from({ length: 10 }).map((_, index) => (
