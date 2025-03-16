@@ -1,43 +1,104 @@
-// src/pages/Home.jsx
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
-import { motion } from 'framer-motion';
+import React from "react";
+import "../assets/style/main.css";
+import video from "../assets/hero.webm";
+import RotatingText from "../components/RotatingText";
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Marquee from "react-fast-marquee";
+import ScrollEffect from "../components/ScrollEffect";
+export default function Home() {
+  return (
+    <div>   
+      <div className="relative overflow-x-hidden pt-5">
+        <div className="relative w-[80%] mx-auto px-4">
+          {/* Header */}
+          <Navbar />
 
-const Home = () => {
-    return (
-        <Layout>
-            <div className="flex flex-col items-center justify-center text-center py-20">
-                <motion.h1
-                    className="text-5xl font-bold mb-6 text-titanite"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    Welcome to Warehouse Schema Generator
-                </motion.h1>
-                <motion.p
-                    className="text-xl mb-8"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.6 }}
-                >
-                    Upload your database schema and generate a warehouse schema with AI enhancements.
-                </motion.p>
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    <Link
-                        to="/upload"
-                        className="bg-titanite text-white px-6 py-3 rounded-lg shadow-lg hover:bg-titanite-dark transition"
-                    >
-                        Get Started
-                    </Link>
-                </motion.div>
+          {/* Main Content */}
+          <main className="gap-4 pt-6">
+            {/* Main Heading */}
+            <div className="col-span-12 relative">
+              <h1 className="text-[#2b2b2b] text-[7rem] font-medium leading-tight">
+                <span className="inline-flex">
+                  AI-Driven Data Warehousing
+                </span>
+                <span className="relative flex items-center gap-10">
+                  <span className="">
+                    Digital Frontiers
+                  </span>
+                  <span className="">
+                    <video className="w-[200px] h-[100px] rounded-full object-cover scale-[1.025]" src={video} autoPlay loop type="video/mp4">
+                    </video>
+                  </span>
+                </span>
+              </h1>
+              <h2 className="text-[#4361ee] text-[7rem] font-medium mt-4 flex">
+                Data
+                <RotatingText
+                  texts={[' Warehouse', ' Schemes', ' Manipulation']}
+                  mainClassName=""
+                  staggerFrom={"last"}
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "-120%" }}
+                  staggerDuration={0.025}
+                  splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+                  transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                  rotationInterval={2000}
+                />
+              </h2>
+
+              {/* Purple 3D shape */}
+              <div className="absolute right-40 bottom-20">
+                <div className="w-24 h-24 bg-[#d7d1ff] rounded-full opacity-80 blur-sm"></div>
+              </div>
             </div>
-        </Layout >
-    );
-};
 
-export default Home;
+            {/* Footer Content */}
+            <div className="col-span-12 mt-14 grid grid-cols-12 gap-4">
+              <div className="col-span-2 text-[1rem] flex items-center">
+                <p className="text-[#2b2b2b] font-semibold"> <span className="font-bold">W.</span> Digital Thinkers 
+                </p>
+              </div>
+
+              <div className="col-span-4 flex items-center">
+                <button className="herobtn w-full bg-[#4361ee] text-white py-6 rounded-md flex items-center overflow-hidden justify-center gap-2 font-medium relative">
+                  <Link to="/upload" className="w-full h-full flex items-center justify-center gap-2">
+                    <div className="herooverlay bg-[#292929] w-full h-full absolute rounded-md left-[-100%]"></div>
+                    <svg className="h-6 w-6 btnSvg absolute left-3 z-[10]" fill="none" viewBox="0 0 19 32"><circle cx="15.584" cy="16.061" r="2.27" fill="#fff" transform="rotate(135 15.584 16.06)"></circle><circle cx="9.805" cy="21.84" r="2.27" fill="#fff" transform="rotate(135 9.805 21.84)"></circle><circle cx="3.21" cy="28.435" r="2.27" fill="#fff" transform="rotate(135 3.21 28.435)"></circle><circle cx="9.806" cy="9.805" r="2.27" fill="#fff" transform="rotate(-135 9.806 9.805)"></circle><circle cx="3.211" cy="3.21" r="2.27" fill="#fff" transform="rotate(-135 3.21 3.21)"></circle></svg>
+                    <svg className="h-6 w-6 btnSvg absolute left-9 z-[10]" fill="none" viewBox="0 0 19 32"><circle cx="15.584" cy="16.061" r="2.27" fill="#fff" transform="rotate(135 15.584 16.06)"></circle><circle cx="9.805" cy="21.84" r="2.27" fill="#fff" transform="rotate(135 9.805 21.84)"></circle><circle cx="3.21" cy="28.435" r="2.27" fill="#fff" transform="rotate(135 3.21 28.435)"></circle><circle cx="9.806" cy="9.805" r="2.27" fill="#fff" transform="rotate(-135 9.806 9.805)"></circle><circle cx="3.211" cy="3.21" r="2.27" fill="#fff" transform="rotate(-135 3.21 3.21)"></circle></svg>
+                    <svg className="h-6 w-6 btnSvg absolute left-14 z-[10]" fill="none" viewBox="0 0 19 32"><circle cx="15.584" cy="16.061" r="2.27" fill="#fff" transform="rotate(135 15.584 16.06)"></circle><circle cx="9.805" cy="21.84" r="2.27" fill="#fff" transform="rotate(135 9.805 21.84)"></circle><circle cx="3.21" cy="28.435" r="2.27" fill="#fff" transform="rotate(135 3.21 28.435)"></circle><circle cx="9.806" cy="9.805" r="2.27" fill="#fff" transform="rotate(-135 9.806 9.805)"></circle><circle cx="3.211" cy="3.21" r="2.27" fill="#fff" transform="rotate(-135 3.21 3.21)"></circle></svg>
+                    <span className="heroBtnText z-10 text-xl font-semibold flex items-center gap-2"> 
+                      Try Now <svg className="h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 11"><circle cx="2.429" cy="2.358" r="1.111" fill="#fff" transform="rotate(45 2.429 2.358)"></circle><circle cx="5.571" cy="5.5" r="1.111" fill="#fff" transform="rotate(135 5.571 5.5)"></circle><circle cx="2.429" cy="8.642" r="1.111" fill="#fff" transform="rotate(135 2.429 8.642)"></circle></svg>
+                    </span>
+                  </Link>
+                </button>
+              </div>
+              <div className="col-span-2 col-start-10">
+                <div className="flex items-start gap-2">
+                  <span className="text-[#4361ee] text-xl">*</span>
+                  <p className="text-[#2b2b2b] text-sm leading-relaxed">
+                    Talks, networking, activities, and parties. Learn from global influential leaders, connect with
+                    like-minded peers, and shape the future of the digital industry.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      
+        <div className="p-5 bg-[#4361ee] text-white mt-10">
+          <Marquee>
+            <div className="flex items-center gap-8">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <span key={index} className="text-[1.2rem] font-bold px-4">
+                  AI-Driven Data Warehousing
+                </span>
+              ))}
+            </div>
+          </Marquee>
+        </div>
+      </div>
+    </div>
+  );
+}

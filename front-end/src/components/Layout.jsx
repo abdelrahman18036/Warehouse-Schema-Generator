@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 const Layout = ({ children }) => {
     return (
-        <div className="flex flex-col min-h-screen bg-background text-white">
+        <div className="flex flex-col min-h-screen ">
             <Navbar />
             <motion.main
                 className="flex-grow container mx-auto p-8"
