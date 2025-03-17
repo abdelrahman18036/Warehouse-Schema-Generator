@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Marquee from "react-fast-marquee";
 import ScrollEffect from "../components/ScrollEffect";
+import ScrollOpacity from "../components/ScrollOpacity";
 export default function Home() {
   return (
     <div>   
@@ -86,7 +87,7 @@ export default function Home() {
             </div>
           </main>
         </div>
-      
+      <ScrollOpacity />
         <div className="p-5 bg-[#4361ee] text-white mt-10 absolute bottom-0 w-full overflow-hidden">
         <Marquee speed={40} gradient={false}>
           <div className="flex items-center gap-6">

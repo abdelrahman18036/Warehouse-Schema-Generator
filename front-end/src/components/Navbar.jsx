@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaRocket, FaDatabase, FaUserCircle, FaChevronDown } from "react-icons/fa";
+import { FaRocket, FaDatabase, FaUserCircle, FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = () => {
   const location = useLocation();
   const [isProductHovered, setIsProductHovered] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Check if a path is active
   const isActive = (path) => {
@@ -40,6 +41,20 @@ const Navbar = () => {
       opacity: 1, 
       y: 0,
       transition: { duration: 0.3, ease: "easeOut" }
+    }
+  };
+
+  // Mobile menu animation variants
+  const mobileMenuVariants = {
+    hidden: { 
+      opacity: 0, 
+      height: 0,
+      transition: { duration: 0.3 }
+    },
+    visible: { 
+      opacity: 1, 
+      height: "auto",
+      transition: { duration: 0.3 }
     }
   };
 
@@ -83,11 +98,11 @@ const Navbar = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="container mx-auto flex justify-between items-center">
+      <div className="container mx-auto flex justify-between items-center flex-wrap md:flex-nowrap">
         {/* Left Section: Brand */}
         <Link 
           to="/" 
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-2 group mb-2 md:mb-0"
         >
           <motion.div 
             className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-md"
@@ -111,9 +126,19 @@ const Navbar = () => {
           </div>
         </Link>
 
+        {/* Mobile Menu Icon */}
+        <div className="md:hidden">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            className="text-gray-700 focus:outline-none"
+          >
+            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
+        </div>
+
         {/* Center Section: Product Info */}
         <div 
-          className="relative flex items-center cursor-pointer rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors"
+          className="relative hidden md:flex items-center cursor-pointer rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors mb-2 md:mb-0"
           onMouseEnter={() => setIsProductHovered(true)}
           onMouseLeave={() => setIsProductHovered(false)}
         >
@@ -168,7 +193,7 @@ const Navbar = () => {
         </div>
 
         {/* Right Section: Navigation Links */}
-        <div className="flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-6">
           <AnimatedLink to="/features" icon={<FaRocket size={14} />}>
             Features
           </AnimatedLink>
@@ -200,6 +225,51 @@ const Navbar = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            className="md:hidden mt-2"
+            variants={mobileMenuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          >
+            <div className="flex flex-col gap-4">
+              <AnimatedLink to="/features" icon={<FaRocket size={14} />}>
+                Features
+              </AnimatedLink>
+              
+              <AnimatedLink to="/login" icon={<FaUserCircle size={14} />}>
+                Login
+              </AnimatedLink>
+              
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="relative"
+              >
+                <Link to="/upload" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-all">
+                  Get Started
+                  <motion.span 
+                    className="text-lg"
+                    animate={{ x: [0, 2, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  >
+                    →
+                  </motion.span>
+                </Link>
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg opacity-30 blur-md -z-10"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
