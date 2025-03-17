@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import UploadSchema from "./pages/UploadSchema";
@@ -8,12 +8,33 @@ import Cursor from "./components/Cursor";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Features from "./components/Features";
+import PreLoader from "./components/PreLoader";
+import { AnimatePresence } from "framer-motion";
 
 function App() {
+  const [loading, setLoading] = useState(true);
+  
+  // Set body overflow hidden during loading to prevent scrolling
+  useEffect(() => {
+    if (loading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [loading]);
+
   return (
-    <html lang="en" className=" antialiased">
+    <html lang="en" className="antialiased">
       <body className="bg">
-      <Cursor />
+        <AnimatePresence mode="wait">
+          {loading && <PreLoader setLoading={setLoading} />}
+        </AnimatePresence>
+        
+        <Cursor />
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
