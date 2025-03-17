@@ -87,17 +87,42 @@ export default function Home() {
           </main>
         </div>
       
-        <div className="p-5 bg-[#4361ee] text-white mt-10 absolute bottom-0 w-full">
-          <Marquee>
-            <div className="flex items-center gap-8">
-              {Array.from({ length: 10 }).map((_, index) => (
-                <span key={index} className="text-[1.2rem] font-bold px-4">
-                  AI-Driven Data Warehousing
-                </span>
-              ))}
-            </div>
-          </Marquee>
+        <div className="p-5 bg-[#4361ee] text-white mt-10 absolute bottom-0 w-full overflow-hidden">
+  <Marquee speed={40} gradient={false}>
+    <div className="flex items-center gap-6">
+      {[
+        "AI-Driven Data Warehousing",
+        "Cloud-Native Data Warehousing",
+        "Automated Data Warehousing",
+        "Real-Time Data Warehousing",
+        "Big Data Warehousing Solutions",
+        "Modern Data Warehousing Architecture",
+        "Data Lake Integration",
+        "Scalable Data Warehousing",
+        "Next-Gen Data Warehousing",
+        "Self-Service Data Warehousing",
+        "Predictive Analytics in Data Warehousing",
+        "Data Warehouse Optimization",
+        "Hybrid Data Warehousing",
+        "Data Warehousing and Business Intelligence",
+        "ETL-Driven Data Warehousing",
+        "Cloud-Based Data Warehouse Platforms",
+        "Machine Learning in Data Warehousing",
+        "Edge Computing and Data Warehousing",
+        "Automated ETL for Data Warehousing",
+        "High-Performance Data Warehousing",
+        "Data Governance in Warehousing"
+      ].map((text, index) => (
+        <div key={index} className="flex items-center justify-center">
+          <div className="h-2 w-2 bg-white  rounded-full mb-[1.5px]"></div>
+          <span className="text-[1.2rem] font-bold px-1 whitespace-nowrap">
+            {text}
+          </span>
         </div>
+      ))}
+    </div>
+  </Marquee>
+</div>
       </div>
     </div>
   );

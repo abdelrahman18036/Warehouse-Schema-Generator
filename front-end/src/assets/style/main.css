@@ -10,9 +10,9 @@ body, html {
   width: 100% !important;
   height: 100% !important;
   background-image: url('../bg.jpg');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   position: relative;
   z-index: 10;
 }

@@ -7,6 +7,7 @@ import "../src/assets/style/main.css";
 import Cursor from "./components/Cursor";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import Features from "./components/Features";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/features" element={<Features />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/upload" element={<UploadSchema />} />
