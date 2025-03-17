@@ -62,7 +62,7 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
     };
     
     const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
+        hidden: { y: 15, opacity: 0 },
         visible: { y: 0, opacity: 1 }
     };
     
@@ -115,14 +115,14 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
 
     return (
         <motion.div
-            className="fixed inset-0 bg-[#111827]/80 flex items-center justify-center z-50 backdrop-blur-sm p-4"
+            className="fixed inset-0 bg-[#111827]/80 flex items-center justify-center z-50 backdrop-blur-sm p-4 "
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
         >
             <motion.div
-                className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden"
+                className="bg-white  shadow-xl w-full max-w-xl overflow-hidden"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -130,24 +130,24 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
             >
                 {/* Header with progress bar */}
                 <div className="relative">
-                    <div className="h-2 bg-gray-100 w-full">
+                    <div className="h-1.5 w-full bg-gray-50   ">
                         <motion.div 
                             className="h-full bg-gradient-to-r from-[#4361ee] to-[#6282fd]" 
                             initial={{ width: 0 }}
                             animate={progressControls}
                         />
                     </div>
-                    <div className="p-8 pb-4 flex justify-between items-center">
+                    <div className="p-6 pb-3 flex justify-between items-center">
                         <motion.div variants={itemVariants} className="flex flex-col">
-                            <h2 className="text-3xl font-bold text-[#2b2b2b]">
+                            <h2 className="text-xl font-bold text-[#2b2b2b]">
                                 Transforming Your Schema
                             </h2>
-                            <div className="text-[#4361ee] text-lg font-semibold mt-1">
+                            <div className="text-[#4361ee] text-sm font-medium mt-1">
                                 Step {effectiveStep} of {steps.length}
                             </div>
                         </motion.div>
                         <motion.div 
-                            className="text-[#4361ee] font-bold text-3xl"
+                            className="text-[#4361ee] font-bold text-2xl"
                             variants={itemVariants}
                         >
                             {progressPercentage}%
@@ -156,8 +156,8 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
                 </div>
 
                 {/* Steps */}
-                <div className="px-8 py-6">
-                    <div className="space-y-8">
+                <div className="px-6 py-4">
+                    <div className="space-y-6">
                         {steps.map((step, index) => {
                             // Determine step status
                             const isActive = step.id === effectiveStep;
@@ -172,63 +172,63 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
                                 <motion.div 
                                     key={step.id}
                                     variants={itemVariants}
-                                    className={`flex items-start ${index !== steps.length - 1 ? 'pb-8 border-l-2 border-dashed ml-3.5 pl-10' : ''} ${
+                                    className={`flex items-start ${index !== steps.length - 1 ? 'pb-6 border-l border-dashed ml-2.5 pl-8' : ''} ${
                                         isActive || isLastStepActive ? 'border-[#4361ee]' : 
                                         isCompleted || isLastStepCompleted ? 'border-[#4361ee]' : 
                                         'border-gray-200'
                                     }`}
                                 >
                                     {/* Step icon/indicator */}
-                                    <div className="-ml-4 relative">
+                                    <div className="-ml-3 relative">
                                         <motion.div 
-                                            className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                                                isActive || isLastStepActive ? 'bg-[#4361ee] text-white ring-4 ring-blue-100' :
+                                            className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                                                isActive || isLastStepActive ? 'bg-[#4361ee] text-white ring-2 ring-blue-100' :
                                                 isCompleted || isLastStepCompleted ? 'bg-[#4361ee] text-white' :
                                                 'bg-gray-200 text-gray-500'
                                             }`}
                                             initial={false}
                                             animate={
                                                 (isActive || isLastStepActive) ? 
-                                                  { scale: [1, 1.2, 1], transition: { repeat: Infinity, duration: 2 } } : 
+                                                  { scale: [1, 1.15, 1], transition: { repeat: Infinity, duration: 2 } } : 
                                                   { scale: 1 }
                                             }
                                         >
                                             {isCompleted || isLastStepCompleted ? (
-                                                <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                 </svg>
                                             ) : (
-                                                <span className="text-sm font-semibold">{step.id}</span>
+                                                <span className="text-xs font-medium">{step.id}</span>
                                             )}
                                         </motion.div>
                                     </div>
 
                                     {/* Step content */}
-                                    <div className="ml-6 flex-1">
+                                    <div className="ml-5 flex-1">
                                         <div className={`flex items-center justify-between ${
                                             isActive || isLastStepActive ? 'text-[#4361ee]' :
                                             isCompleted || isLastStepCompleted ? 'text-[#2b2b2b]' :
                                             'text-gray-400'
                                         }`}>
                                             <div className="flex items-center">
-                                                <div className={`mr-3 text-xl ${
+                                                <div className={`mr-2 text-sm ${
                                                     isActive || isLastStepActive ? 'text-[#4361ee]' :
                                                     isCompleted || isLastStepCompleted ? 'text-[#4361ee]' :
                                                     'text-gray-400'
                                                 }`}>
                                                     {step.icon}
                                                 </div>
-                                                <h3 className="font-semibold text-lg">{step.label}</h3>
+                                                <h3 className="font-medium text-sm">{step.label}</h3>
                                             </div>
                                             
                                             {/* Processing indicator for the last step when active */}
                                             {isLastStepActive && (
-                                                <span className="text-xs font-medium bg-blue-50 text-[#4361ee] px-3 py-1.5 rounded-full">
+                                                <span className="text-[10px] font-medium bg-blue-50 text-[#4361ee] px-2 py-1 rounded-full">
                                                     Processing...
                                                 </span>
                                             )}
                                         </div>
-                                        <p className={`mt-1.5 text-sm ${
+                                        <p className={`mt-1 text-xs ${
                                             isActive || isLastStepActive ? 'text-gray-700' :
                                             isCompleted || isLastStepCompleted ? 'text-gray-600' :
                                             'text-gray-400'
@@ -238,9 +238,9 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
 
                                         {/* Loading animation for active step */}
                                         {(isActive || isLastStepActive) && (
-                                            <div className="mt-3">
+                                            <div className="mt-2">
                                                 <motion.div
-                                                    className="h-1.5 bg-blue-50 rounded-full overflow-hidden"
+                                                    className="h-1 bg-blue-50 rounded-full overflow-hidden"
                                                     initial={{ width: "100%" }}
                                                 >
                                                     <motion.div
@@ -273,24 +273,24 @@ const PreloadOverlay = ({ currentStep: externalStep, onClose }) => {
 
                 {/* Footer */}
                 <motion.div 
-                    className="bg-gray-50 px-8 py-5 flex justify-between items-center"
+                    className="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-100"
                     variants={itemVariants}
                 >
                     <div className="flex items-center">
                         <motion.div 
-                            className="w-2.5 h-2.5 bg-[#4361ee] rounded-full mr-2"
-                            animate={{ scale: [1, 1.5, 1] }}
+                            className="w-2 h-2 bg-[#4361ee] rounded-full mr-2"
+                            animate={{ scale: [1, 1.3, 1] }}
                             transition={{ repeat: Infinity, duration: 1.5 }}
                         ></motion.div>
-                        <p className="text-gray-600 font-medium">
-                            This may take a minute or two depending on schema size
+                        <p className="text-gray-600 text-xs font-medium">
+                            Processing may take a minute depending on schema size
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="flex items-center px-5 py-2.5 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50 transition-colors border border-red-200"
+                        className="flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-red-600 hover:bg-red-50 transition-colors border border-red-200"
                     >
-                        <FaTimes className="mr-2" size={14} />
+                        <FaTimes className="mr-1.5" size={10} />
                         Cancel
                     </button>
                 </motion.div>
