@@ -8,7 +8,7 @@ import 'reactflow/dist/style.css';
 
 const SchemaGraph = ({ data }) => {
     const [selectedNode, setSelectedNode] = useState(null);
-    const [selectedSchemaKey, setSelectedSchemaKey] = useState('ai_enhanced_schema');
+    const [selectedSchemaKey, setSelectedSchemaKey] = useState('original_schema');
 
     if (!data || typeof data !== 'object') {
         console.error('SchemaGraph: Received invalid data:', data);
@@ -136,11 +136,12 @@ const SchemaGraph = ({ data }) => {
     };
 
     const availableSchemas = Object.keys(data).filter(key =>
-        ['ai_enhanced_schema', 'original_schema'].includes(key)
+        ['original_schema', 'ai_enhanced_schema'].includes(key)
     );
     const schemaDisplayNames = {
+        original_schema: 'Original Schema',
         ai_enhanced_schema: 'Warehouse-Schema-Generated',
-        original_schema: 'Original Schema'
+
     };
 
     return (
@@ -152,7 +153,7 @@ const SchemaGraph = ({ data }) => {
                         id="schema-select"
                         value={selectedSchemaKey}
                         onChange={handleSchemaChange}
-                        className="px-3 py-2 bg-[#4361ee] border border-[#2b2b2b] rounded text-white cursor-pointer"
+                        className="px-3 py-2 bg-[#2b2b2b] border border-[#2b2b2b] rounded text-white cursor-pointer"
                     >
                         {availableSchemas.map(schemaKey => (
                             <option key={schemaKey} value={schemaKey}>

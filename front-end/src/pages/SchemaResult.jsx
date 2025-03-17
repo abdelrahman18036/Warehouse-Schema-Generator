@@ -269,7 +269,7 @@ const SchemaResult = () => {
                         </motion.p>
 
                         {/* Action buttons */}
-                        <motion.div
+                        {/* <motion.div
                             className="flex flex-wrap justify-center gap-4 mt-8"
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -291,7 +291,7 @@ const SchemaResult = () => {
                                 <FaDownload />
                                 <span>Download AI Enhanced Schema</span>
                             </button>
-                        </motion.div>
+                        </motion.div> */}
                     </div>
                 </motion.div>
 
