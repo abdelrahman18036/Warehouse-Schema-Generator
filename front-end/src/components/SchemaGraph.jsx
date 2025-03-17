@@ -78,25 +78,35 @@ const SchemaGraph = ({ data }) => {
 
         Object.keys(schema).forEach(tableName => {
             const table = schema[tableName];
-            if (table.fk_columns && Array.isArray(table.fk_columns)) {
-                table.fk_columns.forEach(fk => {
-                    if (!fk || typeof fk !== 'string') return;
-                    const baseName = fk.toLowerCase().replace('_id', '');
-                    const referencedTable = Object.keys(schema).find(
-                        t => t.toLowerCase() === baseName || t.toLowerCase() === baseName + 's'
-                    );
-                    if (referencedTable) {
-                        edges.push({
-                            id: `${tableName}-${fk}->${referencedTable}`,
-                            source: tableName,
-                            target: referencedTable,
-                            animated: true,
-                            label: fk,
-                            style: { stroke: '#4361ee', strokeWidth: 2 },
-                            labelStyle: { fill: '#2b2b2b', fontWeight: 700 },
-                            labelBgStyle: { fill: '#F5F8FA', color: '#2b2b2b', opacity: 0.9 },
-                            labelBgPadding: [4, 4],
-                            labelBgBorderRadius: 4,
+            if (Array.isArray(table.columns)) {
+                table.columns.forEach(col => {
+                    if (col.constraints && Array.isArray(col.constraints)) {
+                        col.constraints.forEach(constraint => {
+                            if (typeof constraint === 'string' && constraint.toUpperCase().includes("REFERENCES")) {
+                                const regex = /REFERENCES\s+(\w+)/i;
+                                const match = constraint.match(regex);
+                                if (match && match[1]) {
+                                    const referencedTable = Object.keys(schema).find(
+                                        t =>
+                                            t.toLowerCase() === match[1].toLowerCase() ||
+                                            t.toLowerCase() === match[1].toLowerCase() + 's'
+                                    );
+                                    if (referencedTable) {
+                                        edges.push({
+                                            id: `${tableName}-${col.name}->${referencedTable}`,
+                                            source: tableName,
+                                            target: referencedTable,
+                                            animated: true,
+                                            label: col.name,
+                                            style: { stroke: '#4361ee', strokeWidth: 2 },
+                                            labelStyle: { fill: '#2b2b2b', fontWeight: 700 },
+                                            labelBgStyle: { fill: '#F5F8FA', color: '#2b2b2b', opacity: 0.9 },
+                                            labelBgPadding: [4, 4],
+                                            labelBgBorderRadius: 4,
+                                        });
+                                    }
+                                }
+                            }
                         });
                     }
                 });
@@ -125,8 +135,12 @@ const SchemaGraph = ({ data }) => {
     };
 
     const availableSchemas = Object.keys(data).filter(key =>
-        ['ai_enhanced_schema', 'original_schema', 'warehouse_schema'].includes(key)
+        ['ai_enhanced_schema', 'original_schema'].includes(key)
     );
+    const schemaDisplayNames = {
+        ai_enhanced_schema: 'Warehouse-Schema-Generated',
+        original_schema: 'Original Schema'
+    };
 
     return (
         <div className="relative w-full h-full bg-[#F5F8FA] rounded-lg overflow-hidden">
@@ -140,7 +154,7 @@ const SchemaGraph = ({ data }) => {
                 >
                     {availableSchemas.map(schemaKey => (
                         <option key={schemaKey} value={schemaKey}>
-                            {schemaKey.replace('_', ' ').toUpperCase()}
+                            {schemaDisplayNames[schemaKey] || schemaKey.replace('_', ' ').toUpperCase()}
                         </option>
                     ))}
                 </select>
