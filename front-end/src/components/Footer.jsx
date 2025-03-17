@@ -391,7 +391,7 @@ const Footer = () => {
                             }}
                         >
                             <motion.span 
-                                className="absolute top-0 left-0 text-[#4361ee] text-xl block w-4 h-4 flex items-center justify-center"
+                                className="absolute top-0 left-0 text-[#4361ee] text-xl  w-4 h-4 flex items-center justify-center"
                                 animate={{ 
                                     scale: [1, 1.2, 1],
                                     opacity: [0.8, 1, 0.8]

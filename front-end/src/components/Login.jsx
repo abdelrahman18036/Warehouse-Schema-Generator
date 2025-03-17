@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, redirect, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,6 +18,7 @@ const Login = () => {
     e.preventDefault();
     // Handle login logic here
     console.log("Login attempt with:", formData);
+    navigate("/upload");
   };
   
   return (

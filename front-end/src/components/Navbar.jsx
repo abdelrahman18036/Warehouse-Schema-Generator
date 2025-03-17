@@ -102,7 +102,7 @@ const Navbar = () => {
               whileHover={{ x: 2 }}
               transition={{ duration: 0.2 }}
             >
-              DataVault
+              DataForge
             </motion.span>
             <div className="flex items-center">
               <span className="text-gray-500 text-sm font-medium">Schema Generator</span>
