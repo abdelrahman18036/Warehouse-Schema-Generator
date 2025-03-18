@@ -8,6 +8,7 @@ import Cursor from "./components/Cursor";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Features from "./components/Features";
+import Demo from "./components/Demo";
 import PreLoader from "./components/PreLoader";
 import { AnimatePresence } from "framer-motion";
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/upload" element={<UploadSchema />} />
             <Route path="/result/:id" element={<SchemaResult />} />
+            <Route path="/demo" element={<Demo />} />
           </Routes>
         </Router>
       </body>

@@ -44,7 +44,6 @@ const Features = () => {
     }
   };
 
-  // Feature section data
   const features = [
     {
       icon: "💾",
@@ -62,26 +61,24 @@ const Features = () => {
       description: "Visually compare your original schema with the enhanced warehouse schema to identify improvements."
     },
     {
-      icon: "📈",
-      title: "Query Performance Optimization",
-      description: "Get suggestions for indexes, partitioning, and other optimizations based on your specific domain and data patterns."
-    },
-    {
       icon: "🔍",
       title: "Domain-Specific Intelligence",
       description: "Specialized optimization for e-commerce, healthcare, finance, education, and more industry verticals."
     },
     {
-      icon: "📝",
-      title: "Documentation Generation",
-      description: "Automatically create comprehensive documentation for your warehouse schema including data lineage."
+      icon: "📈",
+      title: "User Activity Tracking",
+      description: "Monitor schema changes, transformations, and performance metrics over time with comprehensive analytics dashboard."
+    },
+    {
+      icon: "⚙️",
+      title: "User Customization",
+      description: "Fine-tune generated schemas with customizable rules, naming conventions, and industry-specific optimization preferences."
     }
   ];
-
   return (
     <Layout>
       <div className="relative overflow-hidden">
-        {/* Background Elements */}
         <motion.div 
           className="absolute top-40 right-20 w-64 h-64 bg-[#d7d1ff] rounded-full opacity-50 blur-3xl"
           animate={{ 
@@ -110,7 +107,6 @@ const Features = () => {
           }}
         />
 
-        {/* Hero Section */}
         <div className="pt-16 pb-24 px-8 max-w-7xl mx-auto">
           <motion.div
             variants={containerVariants}
@@ -192,7 +188,7 @@ const Features = () => {
                   { number: "01", title: "Upload Your Schema", description: "Upload your SQL database schema file to our platform." },
                   { number: "02", title: "AI Enhancement", description: "Our AI analyzes your schema to identify fact and dimension tables." },
                   { number: "03", title: "Schema Transformation", description: "We transform your schema into an optimized warehouse design." },
-                  { number: "04", title: "Results & Implementation", description: "View the enhanced schema and implement it in your data warehouse." }
+                  { number: "04", title: "Final Result", description: "View the enhanced schema " }
                 ].map((step, index) => (
                   <motion.div
                     key={index}

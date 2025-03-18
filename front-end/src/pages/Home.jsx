@@ -36,7 +36,7 @@ export default function Home() {
               <h2 className="text-[#4361ee] text-[7rem] font-medium mt-4 flex">
                 Data
                 <RotatingText
-                  texts={[' Warehouse', ' Schemes', ' Manipulation']}
+                  texts={[' Warehouse', ' Schema', ' Manipulation']}
                   mainClassName=""
                   staggerFrom={"last"}
                   initial={{ y: "100%" }}
