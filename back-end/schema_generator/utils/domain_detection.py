@@ -5,49 +5,94 @@ from collections import defaultdict
 
 def detect_domain(schema_details):
     domain_keywords = {
-        'E-commerce': {
-            'keywords': [
-                'customer', 'product', 'order', 'cart', 'payment', 'shipment', 'order_item',
-                'sku', 'sales', 'invoice', 'address', 'firstname', 'lastname', 'email', 'price', 'quantity'
-            ],
-            'weight': 1.0
-        },
-        'Healthcare': {
-            'keywords': [
-                'patient', 'doctor', 'appointment', 'prescription', 'diagnosis', 'medical',
-                'health', 'treatment', 'medication', 'hospital', 'clinic', 'first_name', 'last_name', 'dob', 'nurse'
-            ],
-            'weight': 1.0
-        },
-        'Education': {
-            'keywords': [
-                'student', 'course', 'enrollment', 'grade', 'instructor', 'class',
-                'school', 'university', 'teacher', 'first_name', 'last_name', 'subject', 'curriculum', 'degree'
-            ],
-            'weight': 1.0
-        },
-        'Finance': {
-            'keywords': [
-                'account', 'transaction', 'balance', 'loan', 'investment', 'finance',
-                'customer', 'branch', 'credit', 'debit', 'first_name', 'last_name', 'currency', 'interest_rate'
-            ],
-            'weight': 1.0
-        },
-        'Supply Chain': {
-            'keywords': [
-                'supplier', 'inventory', 'shipment', 'warehouse', 'logistics', 'supply',
-                'demand', 'product', 'order', 'sku', 'item', 'stock', 'procurement', 'distribution'
-            ],
-            'weight': 1.0
-        },
-        'Social Media': {
-            'keywords': [
-                'user', 'post', 'comment', 'like', 'friend', 'message', 'social',
-                'profile', 'username', 'content', 'follow', 'first_name', 'last_name', 'share', 'media'
-            ],
-            'weight': 1.0
-        },
+    'E-commerce': {
+        'keywords': [
+            'customer', 'product', 'order', 'cart', 'payment', 'shipment', 'order_item',
+            'sku', 'sales', 'invoice', 'address', 'firstname', 'lastname', 'email', 
+            'price', 'quantity', 'discount', 'coupon', 'tax', 'checkout', 'tracking', 
+            'merchant', 'catalog', 'return', 'refund', 'loyalty', 'subscription'
+        ],
+        'weight': 1.0
+    },
+    'Healthcare': {
+        'keywords': [
+            'patient', 'doctor', 'appointment', 'prescription', 'diagnosis', 'medical',
+            'health', 'treatment', 'medication', 'hospital', 'clinic', 'first_name', 
+            'last_name', 'dob', 'nurse', 'insurance', 'surgery', 'emergency', 'allergy', 
+            'pharmacy', 'symptom', 'vaccine', 'procedure', 'test_result', 'lab', 'record'
+        ],
+        'weight': 1.0
+    },
+    'Education': {
+        'keywords': [
+            'student', 'course', 'enrollment', 'grade', 'instructor', 'class',
+            'school', 'university', 'teacher', 'first_name', 'last_name', 'subject', 
+            'curriculum', 'degree', 'assignment', 'exam', 'quiz', 'attendance', 
+            'semester', 'gpa', 'timetable', 'syllabus', 'department', 'certificate'
+        ],
+        'weight': 1.0
+    },
+    'Finance': {
+        'keywords': [
+            'account', 'transaction', 'balance', 'loan', 'investment', 'finance',
+            'customer', 'branch', 'credit', 'debit', 'first_name', 'last_name', 
+            'currency', 'interest_rate', 'mortgage', 'payment', 'tax', 'stock', 
+            'equity', 'dividend', 'expense', 'ledger', 'audit', 'insurance', 'budget'
+        ],
+        'weight': 1.0
+    },
+    'Supply Chain': {
+        'keywords': [
+            'supplier', 'inventory', 'shipment', 'warehouse', 'logistics', 'supply',
+            'demand', 'product', 'order', 'sku', 'item', 'stock', 'procurement', 
+            'distribution', 'transport', 'retail', 'wholesale', 'supply_chain', 
+            'forecasting', 'sourcing', 'logistic_cost', 'delivery', 'tracking', 'replenishment'
+        ],
+        'weight': 1.0
+    },
+    'Social Media': {
+        'keywords': [
+            'user', 'post', 'comment', 'like', 'friend', 'message', 'social',
+            'profile', 'username', 'content', 'follow', 'first_name', 'last_name', 
+            'share', 'media', 'video', 'image', 'story', 'reaction', 'hashtag', 
+            'follower', 'influencer', 'trend', 'advertisement', 'engagement', 'community'
+        ],
+        'weight': 1.0
+    },
+    'Retail': {
+        'keywords': [
+            'store', 'shop', 'mall', 'retailer', 'barcode', 'checkout', 
+            'point_of_sale', 'purchase', 'customer', 'product', 'sales', 'invoice', 
+            'promotion', 'discount', 'return_policy', 'membership', 'shopping', 'brand'
+        ],
+        'weight': 1.0
+    },
+    'Real Estate': {
+        'keywords': [
+            'property', 'listing', 'agent', 'broker', 'mortgage', 'valuation', 
+            'rental', 'lease', 'tenant', 'landlord', 'appraisal', 'commercial', 
+            'residential', 'contract', 'commission', 'real_estate', 'zoning', 'inspection'
+        ],
+        'weight': 1.0
+    },
+    'Cybersecurity': {
+        'keywords': [
+            'encryption', 'firewall', 'threat', 'attack', 'intrusion', 'malware', 
+            'hacker', 'breach', 'incident', 'password', 'authentication', 'access_control',
+            'data_leak', 'phishing', 'network_security', 'compliance', 'ransomware', 'risk'
+        ],
+        'weight': 1.0
+    },
+    'Telecommunications': {
+        'keywords': [
+            'network', 'signal', 'bandwidth', 'cellular', 'telecom', 'carrier', 
+            'router', 'broadband', 'fiber', '5G', '4G', 'ISP', 'mobile', 'SMS', 
+            'voice_call', 'data_usage', 'coverage', 'roaming', 'satellite', 'modem'
+        ],
+        'weight': 1.0
     }
+}
+
 
     # Flatten table and column names into a single list
     names = []

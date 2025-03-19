@@ -1,7 +1,24 @@
-# comparisons.py
+# from fuzzywuzzy import fuzz
+# from fuzzywuzzy import process
+
+# def fuzzy_match_table_name(user_table_names, standard_table_name, threshold=80):
+#     """
+#     Finds the best fuzzy match for a standard table name in user-defined table names.
+    
+#     Args:
+#         user_table_names (list): List of table names in the user's schema.
+#         standard_table_name (str): The standard schema table name to match.
+#         threshold (int): Minimum similarity score to consider a match (default: 80).
+        
+#     Returns:
+#         str or None: The closest matching user-defined table name or None if no match found.
+#     """
+#     best_match, score = process.extractOne(standard_table_name, user_table_names, scorer=fuzz.ratio)
+#     return best_match if score >= threshold else None
 
 from .enhancements import COLUMN_VARIATIONS, TABLE_VARIATIONS
-
+# from fuzzywuzzy import fuzz
+# from fuzzywuzzy import process
 def compare_schemas(user_schema, standard_schema):
     missing_tables = []
     missing_columns = {}

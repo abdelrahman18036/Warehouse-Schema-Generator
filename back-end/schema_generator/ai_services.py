@@ -4,7 +4,10 @@ import os
 from dotenv import load_dotenv
 import re
 import time
-
+# from langchain.chat_models import ChatOpenAI
+# from langchain.schema import AIMessage, HumanMessage, SystemMessage
+# from langchain.memory import ConversationBufferMemory
+# from langchain.chains import ConversationChain
 # Load API key from .env file
 load_dotenv()
 API_KEY = os.getenv('GEMINI_API_KEY') or "AIzaSyD2T-2WaoJ-Il9r7PFBv0l7_sxAcu_NbdE"
@@ -260,3 +263,31 @@ def generate_enhanced_schema_with_ai(schema_details, domain):
             print("Failed to parse the AI enhanced schema response as JSON.")
             # Return original schema to maintain consistent output format
             return schema_details
+        
+
+
+# # Initialize LangChain LLM with OpenAI GPT
+# llm = ChatOpenAI(model_name="gpt-4", openai_api_key=API_KEY)
+
+# # Add memory to retain conversation history
+# memory = ConversationBufferMemory()
+
+# # Define a conversation chain for interactions
+# conversation = ConversationChain(llm=llm, memory=memory)
+
+# def generate_text_with_langchain(prompt):
+#     """
+#     Generates text using LangChain's LLM model.
+    
+#     Args:
+#         prompt (str): The text prompt to send to the AI model.
+        
+#     Returns:
+#         str: The generated text response.
+#     """
+#     try:
+#         response = conversation.run(prompt)
+#         return response
+#     except Exception as e:
+#         print(f"LangChain generation failed: {e}")
+#         return ""
