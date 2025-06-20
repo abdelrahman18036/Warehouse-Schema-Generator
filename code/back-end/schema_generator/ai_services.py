@@ -10,7 +10,7 @@ import time
 # from langchain.chains import ConversationChain
 # Load API key from .env file
 load_dotenv()
-API_KEY = os.getenv('GEMINI_API_KEY') or "AIzaSyD2T-2WaoJ-Il9r7PFBv0l7_sxAcu_NbdE"
+API_KEY = os.getenv('GEMINI_API_KEY')
 #"AIzaSyAGfUybsz_GLXkpllVS5RFdoWg_y-k7XNs"
 #"AIzaSyB58hL3-9XoxgG5MpAALxPY0lk3WLVReI4"
 # Configure Google Generative AI
