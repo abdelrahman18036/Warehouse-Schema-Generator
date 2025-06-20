@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schema Analysis Result</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2b2b2b;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 {
+            color: #e0e0e0;
+        }
+
+        /* Header and Section Spacing */
+        h1 {
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            color: #ffffff;
+        }
+
+        .alert-warning {
+            background-color: #ff9800;
+            border: 1px solid #ffa726;
+        }
+
+        .alert-info {
+            background-color: #2196f3;
+            border: 1px solid #42a5f5;
+        }
+
+        /* Schema Sections */
+        .schema-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .schema-box {
+            width: 48%;
+            padding: 20px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #333;
+        }
+
+        .schema-box h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+
+        th, td {
+            border: 1px solid #555;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #424242;
+            color: #fff;
+        }
+
+        td {
+            background-color: #3a3a3a;
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 768px) {
+            .schema-box {
+                width: 100%;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Table Hover Effects */
+        tr:hover td {
+            background-color: #474747;
+        }
+
+        /* Suggestions Section */
+        .suggestions {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .suggestions h3 {
+            color: #fff;
+        }
+
+        /* AI Suggestions */
+        .ai-suggestions {
+            background-color: #2b3f51;
+            border: 1px solid #3b6f9c;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Schema Analysis Result</h1>
+
+    <div class="section">
+        <p><strong>Detected Domain:</strong> {{ domain }}</p>
+    </div>
+
+    {% if missing_tables %}
+        <div class="alert alert-warning">
+            <h3>Missing Tables</h3>
+            <ul>
+                {% for table in missing_tables %}
+                    <li>{{ table }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if missing_columns %}
+        <div class="alert alert-warning">
+            <h3>Missing Columns</h3>
+            {% for table_name, columns in missing_columns.items %}
+                <p class="table-name">{{ table_name }}</p>
+                <ul class="column-list">
+                    {% for column in columns %}
+                        <li>{{ column }}</li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if ai_suggestions %}
+        <div class="alert alert-info ai-suggestions">
+            <h3>AI Suggestions</h3>
+            {% if ai_suggestions.missing_tables %}
+                <p><strong>Suggested Missing Tables:</strong></p>
+                <ul>
+                    {% for table in ai_suggestions.missing_tables %}
+                        <li>{{ table }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if ai_suggestions.missing_columns %}
+                <p><strong>Suggested Missing Columns:</strong></p>
+                {% for table, columns in ai_suggestions.missing_columns.items %}
+                    <p class="table-name">{{ table }}</p>
+                    <ul class="column-list">
+                        {% for column in columns %}
+                            <li>{{ column }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="section">
+        <h2>Schema Comparison</h2>
+
+        <div class="schema-section">
+            <!-- Original Schema -->
+            <div class="schema-box">
+                <h3>Original Schema</h3>
+                {% for table_name, table_info in original_schema.items %}
+                    <h4>{{ table_name }}</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for column in table_info.columns %}
+                                <tr>
+                                    <td>{{ column.name }}</td>
+                                    <td>{{ column.type }}</td>
+                                    <td>{{ column.constraints|default:"-" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <!-- Enhanced Warehouse Schema -->
+            <div class="schema-box">
+                <h3>Enhanced Warehouse Schema</h3>
+                {% if warehouse_schema.fact_tables %}
+                    <h4>Fact Tables</h4>
+                    {% for table_name, table_info in warehouse_schema.fact_tables.items %}
+                        <h5>{{ table_name }}</h5>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column Name</th>
+                                    <th>Data Type</th>
+                                    <th>Constraints</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for column in table_info.columns %}
+                                    <tr>
+                                        <td>{{ column.name }}</td>
+                                        <td>{{ column.type }}</td>
+                                        <td>
+                                            {% if column.name in table_info.pk_columns %}
+                                                Primary Key
+                                            {% elif column.name in table_info.fk_columns %}
+                                                Foreign Key
+                                            {% else %}
+                                                {{ column.constraints|default:"-" }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                {% endif %}
+                {% if warehouse_schema.dimension_tables %}
+                    <h4>Dimension Tables</h4>
+                    {% for table_name, table_info in warehouse_schema.dimension_tables.items %}
+                        <h5>{{ table_name }}</h5>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column Name</th>
+                                    <th>Data Type</th>
+                                    <th>Constraints</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for column in table_info.columns %}
+                                    <tr>
+                                        <td>{{ column.name }}</td>
+                                        <td>{{ column.type }}</td>
+                                        <td>
+                                            {% if column.name in table_info.pk_columns %}
+                                                Primary Key
+                                            {% elif column.name in table_info.fk_columns %}
+                                                Foreign Key
+                                            {% else %}
+                                                {{ column.constraints|default:"-" }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- AI Enhanced Warehouse Schema -->
+        <div class="schema-box">
+            <h3>AI Enhanced Warehouse Schema</h3>
+            {% for table_name, table_info in ai_enhanced_schema.items %}
+                <h4>{{ table_name }}</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraints</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for column in table_info.columns %}
+                            <tr>
+                                <td>{{ column.name }}</td>
+                                <td>{{ column.type }}</td>
+                                <td>
+                                    {% if column.name in table_info.pk_columns %}
+                                        Primary Key
+                                    {% elif column.name in table_info.fk_columns %}
+                                        Foreign Key
+                                    {% else %}
+                                        {{ column.constraints|default:"-" }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
