@@ -682,44 +682,7 @@ const SchemaResult = () => {
                                             )}
                                         </Accordion>
 
-                                        {/* Export Section */}
-                                        <Accordion
-                                            id="export-schemas"
-                                            title="Export Schemas"
-                                            icon={<FaDownload size={20} />}
-                                        >
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                {/* Original Schema Export */}
-                                                <div className="space-y-3">
-                                                    <h5 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Original Schema</h5>
-                                                    <ExportButtons
-                                                        schemaId={id}
-                                                        schemaType="original"
-                                                        schemaName="Original Schema"
-                                                    />
-                                                </div>
 
-                                                {/* Warehouse Schema Export */}
-                                                <div className="space-y-3">
-                                                    <h5 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Warehouse Schema</h5>
-                                                    <ExportButtons
-                                                        schemaId={id}
-                                                        schemaType="warehouse"
-                                                        schemaName="Warehouse Schema"
-                                                    />
-                                                </div>
-
-                                                {/* AI Enhanced Schema Export */}
-                                                <div className="space-y-3">
-                                                    <h5 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">AI Enhanced Schema</h5>
-                                                    <ExportButtons
-                                                        schemaId={id}
-                                                        schemaType="ai_enhanced"
-                                                        schemaName="AI Enhanced Schema"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </Accordion>
                                     </motion.div>
                                 </motion.div>
                             )}
