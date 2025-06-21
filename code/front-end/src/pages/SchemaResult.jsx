@@ -443,16 +443,18 @@ const SchemaResult = () => {
                                                         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                                             <ul className="divide-y divide-gray-200">
                                                                 {aiSuggestions.missing_tables.map((table, index) => (
-                                                                    <li key={index} className="p-4 flex items-start hover:bg-gray-50">
+                                                                    <li key={index} className="p-4 flex items-start hover:bg-gray-50 transition-colors">
                                                                         <div className="mr-3 mt-0.5 text-green-500">
-                                                                            <FaPlus size={14} />
+                                                                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                                                                <FaPlus size={12} />
+                                                                            </div>
                                                                         </div>
-                                                                        <div>
-                                                                            <p className="font-medium text-gray-800">
+                                                                        <div className="flex-1">
+                                                                            <p className="font-semibold text-gray-800 text-lg">
                                                                                 {typeof table === 'object' ? table.name : table || 'Unknown Table'}
                                                                             </p>
                                                                             {typeof table === 'object' && table.purpose && (
-                                                                                <p className="text-gray-600 text-sm">{table.purpose}</p>
+                                                                                <p className="text-gray-600 text-sm mt-1 leading-relaxed">{table.purpose}</p>
                                                                             )}
                                                                         </div>
                                                                     </li>
@@ -480,11 +482,21 @@ const SchemaResult = () => {
                                                         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                                             <ul className="divide-y divide-gray-200">
                                                                 {aiSuggestions.missing_columns.map((col, index) => (
-                                                                    <li key={index} className="p-4 flex flex-col hover:bg-gray-50">
-                                                                        <p className="font-medium text-gray-800">Table: {col.table || 'Unknown Table'}</p>
-                                                                        <p className="text-gray-800">Column: {col.name || 'Unknown Column'}</p>
-                                                                        <p className="text-gray-500 text-sm">Type: {col.type}</p>
-                                                                        <p className="text-gray-500 text-sm">Purpose: {col.purpose}</p>
+                                                                    <li key={index} className="p-4 flex items-start hover:bg-gray-50 transition-colors">
+                                                                        <div className="mr-3 mt-0.5 text-purple-500">
+                                                                            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                                                                                <FaColumns size={12} />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex-1">
+                                                                            <div className="flex items-center gap-2 mb-2">
+                                                                                <span className="font-semibold text-gray-800">{col.table || 'Unknown Table'}</span>
+                                                                                <span className="text-gray-400">→</span>
+                                                                                <span className="font-semibold text-blue-600">{col.name || 'Unknown Column'}</span>
+                                                                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{col.type}</span>
+                                                                            </div>
+                                                                            <p className="text-gray-600 text-sm leading-relaxed">{col.purpose}</p>
+                                                                        </div>
                                                                     </li>
                                                                 ))}
                                                             </ul>
@@ -566,13 +578,18 @@ const SchemaResult = () => {
                                                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                                     <ul className="divide-y divide-gray-200">
                                                         {missingTables.map((table, index) => (
-                                                            <li
-                                                                key={index}
-                                                                className="p-4 hover:bg-gray-50"
-                                                            >
-                                                                <p className="text-gray-800">
-                                                                    {typeof table === 'string' ? table : 'Unknown Table'}
-                                                                </p>
+                                                            <li key={index} className="p-4 flex items-start hover:bg-gray-50">
+                                                                <div className="mr-3 mt-0.5 text-orange-500">
+                                                                    <FaTable size={14} />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="font-medium text-gray-800">
+                                                                        {typeof table === 'object' ? table.name : table || 'Unknown Table'}
+                                                                    </p>
+                                                                    {typeof table === 'object' && table.purpose && (
+                                                                        <p className="text-gray-600 text-sm mt-1">{table.purpose}</p>
+                                                                    )}
+                                                                </div>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -594,35 +611,28 @@ const SchemaResult = () => {
                                             title="Missing Columns"
                                             icon={<FaColumns size={20} />}
                                         >
-                                            {missingColumns && Object.keys(missingColumns).length > 0 ? (
-                                                <div className="space-y-4">
-                                                    {Object.keys(missingColumns).map((table, index) => (
-                                                        <div key={index} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                                            <div className="bg-gray-50 p-3 border-b border-gray-200">
-                                                                <p className="font-medium text-gray-800">
-                                                                    Table: {table}
-                                                                </p>
-                                                            </div>
-                                                            {Array.isArray(missingColumns[table]) && missingColumns[table].length > 0 ? (
-                                                                <ul className="divide-y divide-gray-200">
-                                                                    {missingColumns[table].map((col, idx) => (
-                                                                        <li
-                                                                            key={idx}
-                                                                            className="p-3 hover:bg-gray-50"
-                                                                        >
-                                                                            <p className="text-gray-800">
-                                                                                {typeof col === 'string' ? col : 'Unknown Column'}
-                                                                            </p>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            ) : (
-                                                                <div className="p-3">
-                                                                    <p className="text-gray-500">No missing columns.</p>
+                                            {Array.isArray(aiSuggestions?.missing_columns) && aiSuggestions.missing_columns.length > 0 ? (
+                                                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                                    <ul className="divide-y divide-gray-200">
+                                                        {aiSuggestions.missing_columns.map((col, index) => (
+                                                            <li key={index} className="p-4 flex items-start hover:bg-gray-50">
+                                                                <div className="mr-3 mt-0.5 text-purple-500">
+                                                                    <FaColumns size={14} />
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    ))}
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <span className="font-medium text-gray-800">{col.table || 'Unknown Table'}</span>
+                                                                        <span className="text-gray-400">→</span>
+                                                                        <span className="font-medium text-blue-600">{col.name || 'Unknown Column'}</span>
+                                                                    </div>
+                                                                    <div className="text-sm text-gray-600 space-y-1">
+                                                                        <p><span className="font-medium">Type:</span> {col.type}</p>
+                                                                        <p><span className="font-medium">Purpose:</span> {col.purpose}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
                                                 </div>
                                             ) : (
                                                 <div className="bg-green-50 p-4 rounded-lg">
