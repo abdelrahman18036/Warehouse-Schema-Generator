@@ -1,0 +1,1 @@
+# Tests package for schema_generator app 

@@ -17,4 +17,4 @@ class UploadSchemaForm(forms.ModelForm):
 
     class Meta:
         model = UserDatabase
-        fields = ['name', 'schema_file', 'domain']
+        fields = ['schema_name', 'domain']
