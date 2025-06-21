@@ -6,13 +6,105 @@ from rest_framework import status
 from .serializers import UserDatabaseSerializer
 from .models import UserDatabase
 from .utils.schema_parsing import parse_sql_file
-from .utils.schema_generation import generate_warehouse_schema
+# from .utils.schema_generation import generate_warehouse_schema  # No longer used
 from .ai_services import (
     detect_domain_with_ai,
     suggest_missing_elements,
-    generate_enhanced_schema_with_ai
+    generate_warehouse_schema_with_ai,
+    generate_full_detailed_ai_warehouse
 )
 from django.shortcuts import get_object_or_404
+
+def validate_schema_structure(schema, schema_name="schema"):
+    """
+    Validate that the schema has the correct structure.
+    
+    Args:
+        schema (dict): The schema to validate
+        schema_name (str): Name for logging purposes
+        
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    if not isinstance(schema, dict):
+        print(f"Error: {schema_name} is not a dictionary: {type(schema)}")
+        return False
+    
+    for table_name, table_info in schema.items():
+        if not isinstance(table_info, dict):
+            print(f"Error: {schema_name} table '{table_name}' is not a dictionary: {type(table_info)}")
+            return False
+        
+        if 'columns' not in table_info:
+            print(f"Error: {schema_name} table '{table_name}' missing 'columns' key")
+            return False
+        
+        if not isinstance(table_info['columns'], list):
+            print(f"Error: {schema_name} table '{table_name}' columns is not a list: {type(table_info['columns'])}")
+            return False
+        
+        for i, column in enumerate(table_info['columns']):
+            if not isinstance(column, dict):
+                print(f"Error: {schema_name} table '{table_name}' column {i} is not a dictionary: {type(column)}")
+                return False
+            
+            required_keys = ['name', 'type', 'constraints']
+            for key in required_keys:
+                if key not in column:
+                    print(f"Error: {schema_name} table '{table_name}' column {i} missing '{key}' key")
+                    return False
+    
+    return True
+
+def convert_schema_format(schema_details):
+    """
+    Convert schema from parsing format to the required API format.
+    
+    Args:
+        schema_details (dict): Schema in parsing format
+        
+    Returns:
+        dict: Schema in the required format
+    """
+    converted_schema = {}
+    
+    for table_name, table_info in schema_details.items():
+        converted_schema[table_name] = {
+            "columns": []
+        }
+        
+        # Process columns
+        for column in table_info.get('columns', []):
+            # Convert constraints from string to list
+            constraints = column.get('constraints', '')
+            if isinstance(constraints, str):
+                # Split constraints and clean them up
+                constraint_list = []
+                if constraints.strip():
+                    # Simple parsing of common constraints
+                    constraints_upper = constraints.upper()
+                    if 'PRIMARY KEY' in constraints_upper:
+                        constraint_list.append('PRIMARY KEY')
+                    if 'NOT NULL' in constraints_upper:
+                        constraint_list.append('NOT NULL')
+                    if 'UNIQUE' in constraints_upper:
+                        constraint_list.append('UNIQUE')
+                    if 'AUTO_INCREMENT' in constraints_upper or 'AUTOINCREMENT' in constraints_upper:
+                        constraint_list.append('AUTO_INCREMENT')
+                    if 'FOREIGN KEY' in constraints_upper:
+                        constraint_list.append('FOREIGN KEY')
+            elif isinstance(constraints, list):
+                constraint_list = constraints
+            else:
+                constraint_list = []
+            
+            converted_schema[table_name]["columns"].append({
+                "name": column.get('name', ''),
+                "type": column.get('type', ''),
+                "constraints": constraint_list
+            })
+    
+    return converted_schema
 
 class UploadSchemaAPIView(APIView):
     def post(self, request, format=None):
@@ -28,59 +120,104 @@ class UploadSchemaAPIView(APIView):
                 user_db.domain = domain
                 user_db.save(update_fields=['domain'])
 
-            # Generate warehouse schema
-            warehouse_schema, missing_tables, missing_columns = generate_warehouse_schema(schema_details, domain)
+            # Generate warehouse schema using AI (one fact table + dimensions)
+            warehouse_schema = generate_warehouse_schema_with_ai(schema_details, domain)
 
-            # Process warehouse_schema to add pk_columns and fk_columns
-            for table_type in ['fact_tables', 'dimension_tables']:
-                tables = warehouse_schema.get(table_type, {})
-                for table_name, table_info in tables.items():
-                    # Extract primary key columns
-                    pk_columns = set(table_info.get('primary_keys', []))
+            # Process warehouse_schema to add pk_columns and fk_columns if it's valid
+            if isinstance(warehouse_schema, dict):
+                for table_name, table_info in warehouse_schema.items():
+                    if isinstance(table_info, dict):
+                        columns = table_info.get('columns', [])
+                        pk_columns = set()
+                        fk_columns = set()
+                        
+                        if isinstance(columns, list):
+                            for column in columns:
+                                if isinstance(column, dict):
+                                    constraints = column.get('constraints', [])
+                                    column_name = column.get('name')
+
+                                    # Normalize constraints to a list of strings
+                                    if isinstance(constraints, list):
+                                        constraints_list = [str(c).lower() for c in constraints]
+                                    elif isinstance(constraints, str):
+                                        constraints_list = [constraints.lower()]
+                                    else:
+                                        constraints_list = []
+
+                                    # Check for primary key and foreign key constraints
+                                    if any('primary key' in c for c in constraints_list):
+                                        pk_columns.add(column_name)
+                                    if any('foreign key' in c for c in constraints_list):
+                                        fk_columns.add(column_name)
+                        
+                        table_info['pk_columns'] = list(pk_columns)
+                        table_info['fk_columns'] = list(fk_columns)
+
+            # Generate full detailed AI warehouse schema (comprehensive enterprise schema)
+            ai_enhanced_schema = generate_full_detailed_ai_warehouse(schema_details, domain)
+
+            # Validate the AI enhanced schema structure
+            if not validate_schema_structure(ai_enhanced_schema, "ai_enhanced_schema"):
+                print("AI enhanced schema validation failed, setting empty schema")
+                ai_enhanced_schema = {}
+
+            # Process ai_enhanced_schema (now one fact table + multiple dimension tables) to add pk_columns and fk_columns if possible
+            # Add validation to ensure ai_enhanced_schema is properly formatted
+            if isinstance(ai_enhanced_schema, dict):
+                for table_name, table_info in ai_enhanced_schema.items():
+                    # Validate that table_info is a dictionary
+                    if not isinstance(table_info, dict):
+                        print(f"Warning: table_info for {table_name} is not a dictionary: {type(table_info)}")
+                        continue
+                    
+                    columns = table_info.get('columns', [])
+                    pk_columns = set()
+                    fk_columns = set()
+                    
+                    # Validate columns is a list
+                    if not isinstance(columns, list):
+                        print(f"Warning: columns for {table_name} is not a list: {type(columns)}")
+                        continue
+                    
+                    for column in columns:
+                        # Validate column is a dictionary
+                        if not isinstance(column, dict):
+                            print(f"Warning: column in {table_name} is not a dictionary: {type(column)}")
+                            continue
+                            
+                        constraints = column.get('constraints', [])
+                        column_name = column.get('name')
+
+                        # Normalize constraints to a list of strings
+                        if isinstance(constraints, list):
+                            constraints_list = [str(c).lower() for c in constraints]
+                        elif isinstance(constraints, str):
+                            constraints_list = [constraints.lower()]
+                        else:
+                            constraints_list = []
+
+                        # Check for primary key and foreign key constraints
+                        if any('primary key' in c for c in constraints_list):
+                            pk_columns.add(column_name)
+                        if any('foreign key' in c for c in constraints_list):
+                            fk_columns.add(column_name)
+                    
                     table_info['pk_columns'] = list(pk_columns)
-
-                    # Extract foreign key columns
-                    fk_columns = set(fk['column'] for fk in table_info.get('foreign_keys', []))
                     table_info['fk_columns'] = list(fk_columns)
-
-            # Use AI to generate the enhanced schema
-            ai_enhanced_schema = generate_enhanced_schema_with_ai(schema_details, domain)
-
-            # Process ai_enhanced_schema to add pk_columns and fk_columns if possible
-            for table_name, table_info in ai_enhanced_schema.items():
-                columns = table_info.get('columns', [])
-                pk_columns = set()
-                fk_columns = set()
-                for column in columns:
-                    constraints = column.get('constraints', [])
-                    column_name = column.get('name')
-
-                    # Normalize constraints to a list of strings
-                    if isinstance(constraints, list):
-                        constraints_list = [str(c).lower() for c in constraints]
-                    elif isinstance(constraints, str):
-                        constraints_list = [constraints.lower()]
-                    else:
-                        constraints_list = []
-
-                    # Check for primary key and foreign key constraints
-                    if any('primary key' in c for c in constraints_list):
-                        pk_columns.add(column_name)
-                    if any('foreign key' in c for c in constraints_list):
-                        fk_columns.add(column_name)
-                table_info['pk_columns'] = list(pk_columns)
-                table_info['fk_columns'] = list(fk_columns)
+            else:
+                print(f"Warning: ai_enhanced_schema is not a dictionary: {type(ai_enhanced_schema)}")
 
             # AI suggestions
             ai_suggestions = suggest_missing_elements(schema_details, domain)
 
             # Update the user_db instance with all processed data
-            user_db.original_schema = schema_details
+            user_db.original_schema = convert_schema_format(schema_details)
             user_db.warehouse_schema = warehouse_schema
             user_db.ai_enhanced_schema = ai_enhanced_schema
             user_db.ai_suggestions = ai_suggestions
-            user_db.missing_tables = missing_tables
-            user_db.missing_columns = missing_columns
+            user_db.missing_tables = ai_suggestions.get('missing_tables', [])
+            user_db.missing_columns = ai_suggestions.get('missing_columns', [])
             user_db.save(update_fields=[
                 'original_schema',
                 'warehouse_schema',
@@ -105,7 +242,10 @@ class OriginalSchemaAPIView(BaseUserDatabaseAPIView):
     def get(self, request, pk, format=None):
         user_db = self.get_user_db(pk)
         if user_db.original_schema:
-            return Response(user_db.original_schema, status=status.HTTP_200_OK)
+            # Ensure the schema is in the correct format
+            formatted_schema = user_db.original_schema
+            if formatted_schema:
+                return Response(formatted_schema, status=status.HTTP_200_OK)
         return Response({'error': 'Original schema not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 class WarehouseSchemaAPIView(BaseUserDatabaseAPIView):
