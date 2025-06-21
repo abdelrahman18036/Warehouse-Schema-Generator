@@ -8,8 +8,121 @@ import ReactFlow, {
     addEdge,
     applyNodeChanges,
     applyEdgeChanges,
+    Handle,
+    Position,
+    MarkerType,
+    BackgroundVariant
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+
+// ---------- Custom Node Component ---------- //
+const DBNode = ({ data, selected }) => {
+    const { tableName, columns, isFact } = data;
+    const cols = Array.isArray(columns) ? columns : [];
+
+    return (
+        <div className={`relative bg-white/90 backdrop-blur-lg rounded-2xl border transition-all duration-500 hover:scale-105 ${selected ? 'ring-2 ring-blue-400/50 shadow-2xl' : 'shadow-lg'
+            } ${isFact ? 'border-blue-200/60' : 'border-slate-200/60'} w-[280px]`}>
+
+            {/* Subtle gradient overlay */}
+            <div className={`absolute inset-0 rounded-2xl opacity-5 ${isFact ? 'bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-gradient-to-br from-slate-400 to-slate-600'
+                }`}></div>
+
+            {/* Header */}
+            <div className="relative px-4 py-3 border-b border-slate-100/80">
+                <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${isFact ? 'bg-blue-500' : 'bg-slate-400'}`}></div>
+                    <h3 className="font-semibold text-slate-800 text-sm tracking-wide">{tableName}</h3>
+                    <div className={`ml-auto px-2 py-1 rounded-full text-xs font-medium ${isFact
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'bg-slate-50 text-slate-600 border border-slate-200'
+                        }`}>
+                        {isFact ? 'FACT' : 'DIM'}
+                    </div>
+                </div>
+            </div>
+
+            {/* Column List */}
+            <div className="p-4 space-y-2 max-h-64 overflow-y-auto">
+                {cols.length > 0 ? (
+                    cols.map((col, idx) => {
+                        const isPrimaryKey = col.constraints?.some(c =>
+                            typeof c === 'string' && c.toUpperCase().includes('PRIMARY KEY')
+                        );
+                        const isForeignKey = col.constraints?.some(c =>
+                            typeof c === 'string' && (c.toUpperCase().includes('FOREIGN KEY') || c.toUpperCase().includes('REFERENCES'))
+                        );
+
+                        return (
+                            <div key={idx} className="group hover:bg-slate-50/50 rounded-lg p-2 transition-colors duration-200">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
+                                        {col.name}
+                                    </span>
+                                    <div className="flex gap-1">
+                                        {isPrimaryKey && (
+                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                                        )}
+                                        {isForeignKey && (
+                                            <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="text-xs text-slate-500 font-mono">
+                                    {col.type}
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="text-center py-6 text-slate-400">
+                        <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-slate-100 flex items-center justify-center">
+                            <span className="text-slate-400 text-sm">∅</span>
+                        </div>
+                        <span className="text-xs">No columns</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-2 border-t border-slate-100/80 bg-slate-50/30">
+                <div className="flex justify-between items-center text-xs text-slate-500">
+                    <span>{cols.length} field{cols.length !== 1 ? 's' : ''}</span>
+                    <div className="flex gap-2">
+                        <div className="flex items-center gap-1">
+                            <div className="w-1 h-1 rounded-full bg-amber-400"></div>
+                            <span>PK</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-1 h-1 rounded-full bg-purple-400"></div>
+                            <span>FK</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Connection Handles */}
+            <Handle
+                type="target"
+                position={Position.Left}
+                id="left"
+                className="!w-3 !h-3 !border-2 !border-white !shadow-md"
+                style={{
+                    background: isFact ? '#3b82f6' : '#64748b',
+                }}
+            />
+            <Handle
+                type="source"
+                position={Position.Right}
+                id="right"
+                className="!w-3 !h-3 !border-2 !border-white !shadow-md"
+                style={{
+                    background: isFact ? '#3b82f6' : '#64748b',
+                }}
+            />
+        </div>
+    );
+};
 
 const SchemaGraph = ({ data }) => {
     const [selectedNode, setSelectedNode] = useState(null);
@@ -269,9 +382,11 @@ const SchemaGraph = ({ data }) => {
                 // Consistent node configuration for all tables
                 nodesArray.push({
                     id: tableName,
-                    type: 'default',
+                    type: 'dbNode',
                     data: {
-                        label: `${isFact ? '🎯 ' : '📋 '}${tableName}\n\n${displayText}`
+                        tableName,
+                        columns: table.columns || [],
+                        isFact
                     },
                     position: { x: Math.round(x), y: Math.round(y) },
                     draggable: true,
@@ -309,42 +424,29 @@ const SchemaGraph = ({ data }) => {
 
             // Generate edges using improved detection
             const connections = detectConnections(schema);
-            connections.forEach(conn => {
-                edgesArray.push({
-                    id: conn.id,
-                    source: conn.source,
-                    target: conn.target,
-                    sourceHandle: 'right',
-                    targetHandle: 'left',
-                    animated: true,
-                    label: conn.label,
-                    type: 'step',
-                    style: {
-                        stroke: '#6366f1',
-                        strokeWidth: 3,
-                        strokeDasharray: '4 4'
-                    },
-                    labelStyle: {
-                        fill: '#334155',
-                        fontWeight: 600,
-                        fontSize: '12px',
-                        fontFamily: "'Inter', sans-serif",
-                    },
-                    labelBgStyle: {
-                        fill: 'rgba(255, 255, 255, 0.9)',
-                        stroke: '#cbd5e1',
-                        strokeWidth: 1,
-                        opacity: 0.9,
-                        rx: 8,
-                        ry: 8,
-                    },
-                    labelBgPadding: [8, 4],
-                    labelBgBorderRadius: 8,
-                });
-            });
+            const edges = connections.map((conn, index) => ({
+                id: `edge-${index}`,
+                source: conn.source,
+                target: conn.target,
+                sourceHandle: 'right',
+                targetHandle: 'left',
+                type: 'smoothstep',
+                animated: false,
+                style: {
+                    stroke: '#94a3b8',
+                    strokeWidth: 1.5,
+                    strokeDasharray: '5,5',
+                },
+                markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    width: 16,
+                    height: 16,
+                    color: '#94a3b8',
+                },
+            }));
 
-            console.log(`Generated ${nodesArray.length} nodes and ${edgesArray.length} edges for ${selectedSchemaKey}`);
-            return { nodes: nodesArray, edges: edgesArray };
+            console.log(`Generated ${nodesArray.length} nodes and ${edges.length} edges for ${selectedSchemaKey}`);
+            return { nodes: nodesArray, edges };
         };
 
         const { nodes: newNodes, edges: newEdges } = generateElements();
@@ -435,6 +537,10 @@ const SchemaGraph = ({ data }) => {
 
     const selectedTable = selectedNode ? schema[selectedNode] : null;
 
+    const nodeTypes = useMemo(() => ({
+        dbNode: DBNode
+    }), []);
+
     return (
         <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-white' : 'relative'} w-full h-full`}>
             {/* Header */}
@@ -476,7 +582,12 @@ const SchemaGraph = ({ data }) => {
             </div>
 
             {/* ReactFlow Container */}
-            <div className="w-full h-full" ref={reactFlowWrapper} style={{ height: isFullscreen ? 'calc(100vh - 80px)' : '600px' }}>
+            <div className="w-full h-full bg-gradient-to-br from-slate-50 via-white to-slate-100 relative overflow-hidden"
+                ref={reactFlowWrapper}
+                style={{ height: isFullscreen ? 'calc(100vh - 80px)' : '600px' }}>
+                {/* Subtle background pattern */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.15)_1px,transparent_0)] bg-[length:24px_24px]"></div>
+
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -494,43 +605,23 @@ const SchemaGraph = ({ data }) => {
                     zoomOnDoubleClick={false}
                     preventScrolling={false}
                     fitView
-                    fitViewOptions={{ padding: 0.1 }}
-                    attributionPosition="bottom-left"
+                    fitViewOptions={{ padding: 0.2 }}
                     defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
-                    minZoom={0.2}
-                    maxZoom={2}
+                    minZoom={0.3}
+                    maxZoom={1.5}
+                    nodeTypes={nodeTypes}
+                    className="bg-transparent"
+                    proOptions={{ hideAttribution: true }}
                 >
                     <Background
-                        color="#e2e8f0"
+                        variant={BackgroundVariant.Dots}
                         gap={20}
                         size={1}
-                        style={{ backgroundColor: '#f8fafc' }}
+                        color="rgba(148, 163, 184, 0.2)"
                     />
                     <Controls
-                        position="top-right"
-                        style={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '12px',
-                            backdropFilter: 'blur(8px)',
-                        }}
-                    />
-                    <MiniMap
-                        nodeColor={(node) => {
-                            const isFact = factTables.includes(node.id);
-                            return isFact ? '#3b82f6' : '#cbd5e1';
-                        }}
-                        nodeStrokeColor={(node) => {
-                            const isFact = factTables.includes(node.id);
-                            return isFact ? '#2563eb' : '#94a3b8';
-                        }}
-                        position="bottom-right"
-                        style={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '12px',
-                            backdropFilter: 'blur(8px)',
-                        }}
+                        className="!bg-white/80 !backdrop-blur-sm !border !border-slate-200 !rounded-xl !shadow-lg"
+                        showInteractive={false}
                     />
                 </ReactFlow>
             </div>
