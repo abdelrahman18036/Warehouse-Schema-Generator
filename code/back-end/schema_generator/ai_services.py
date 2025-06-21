@@ -94,7 +94,7 @@ def extract_json(text):
         json_candidate = re.sub(r',\s*]', ']', json_candidate)
         return json_candidate
     
-    return '{}'
+        return '{}'
 
 def parse_ai_json_response(response_text, fallback_schema=None):
     """
