@@ -428,26 +428,57 @@ const SchemaGraph = ({ data }) => {
 
             // Generate edges using improved detection
             const connections = detectConnections(schema);
-            const edges = connections.map((conn, index) => ({
-                id: `edge-${index}`,
-                source: conn.source,
-                target: conn.target,
-                sourceHandle: 'right',
-                targetHandle: 'left',
-                type: 'smoothstep',
-                animated: false,
-                style: {
-                    stroke: '#94a3b8',
-                    strokeWidth: 1.5,
-                    strokeDasharray: '5,5',
-                },
-                markerEnd: {
-                    type: MarkerType.ArrowClosed,
-                    width: 16,
-                    height: 16,
-                    color: '#94a3b8',
-                },
-            }));
+            const edges = connections.map((conn, index) => {
+                // Check if the source is a fact table to make connection blue
+                const isFactConnection = factTables.includes(conn.source);
+
+                // Find the primary key for the connection label
+                const sourceTable = schema[conn.source];
+                let pkColumn = null;
+                if (sourceTable && sourceTable.columns && Array.isArray(sourceTable.columns)) {
+                    pkColumn = sourceTable.columns.find(col =>
+                        col.constraints &&
+                        Array.isArray(col.constraints) &&
+                        col.constraints.some(c =>
+                            typeof c === 'string' && c.toUpperCase().includes('PRIMARY KEY')
+                        )
+                    );
+                }
+
+                // Create the label - show PK if found, otherwise show the connecting column
+                const label = pkColumn ? `PK: ${pkColumn.name}` : conn.label;
+
+                return {
+                    id: `edge-${index}`,
+                    source: conn.source,
+                    target: conn.target,
+                    sourceHandle: 'right',
+                    targetHandle: 'left',
+                    type: 'smoothstep',
+                    animated: false,
+                    label: label,
+                    labelStyle: {
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: isFactConnection ? '#3b82f6' : '#64748b',
+                        backgroundColor: 'white',
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        border: isFactConnection ? '1px solid #3b82f6' : '1px solid #94a3b8',
+                    },
+                    style: {
+                        stroke: isFactConnection ? '#3b82f6' : '#94a3b8',
+                        strokeWidth: isFactConnection ? 2.5 : 1.5,
+                        strokeDasharray: isFactConnection ? 'none' : '5,5',
+                    },
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        width: 16,
+                        height: 16,
+                        color: isFactConnection ? '#3b82f6' : '#94a3b8',
+                    },
+                };
+            });
 
             console.log(`Generated ${nodesArray.length} nodes and ${edges.length} edges for ${selectedSchemaKey}`);
             return { nodes: nodesArray, edges };
