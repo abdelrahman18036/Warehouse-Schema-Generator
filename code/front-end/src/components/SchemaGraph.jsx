@@ -162,24 +162,28 @@ const SchemaGraph = ({ data }) => {
                 }
 
                 // Method 3: Infer from column naming patterns (only if no explicit reference found)
-                if (columnName.endsWith('_id')) {
-                    const baseName = columnName.replace(/_id$/, '');
+                if (columnName.endsWith('_id') || columnName.endsWith('_key')) {
+                    const baseName = columnName.replace(/_id$|_key$/, '');
                     referencedTable = Object.keys(schema).find(t => {
                         const tLower = t.toLowerCase();
+                        const tStripped = tLower.replace(/^dim_|^fact_/, '');
                         return tLower === baseName ||
+                            tStripped === baseName ||
                             tLower === baseName + 's' ||
-                            baseName === tLower.slice(0, -1);
+                            tStripped === baseName + 's' ||
+                            baseName === tLower.slice(0, -1) ||
+                            baseName === tStripped.slice(0, -1);
                     });
+                }
 
-                    if (referencedTable && referencedTable !== tableName) {
-                        connections.push({
-                            id: `${tableName}-${col.name}->${referencedTable}`,
-                            source: tableName,
-                            target: referencedTable,
-                            label: col.name,
-                            animated: true
-                        });
-                    }
+                if (referencedTable && referencedTable !== tableName) {
+                    connections.push({
+                        id: `${tableName}-${col.name}->${referencedTable}`,
+                        source: tableName,
+                        target: referencedTable,
+                        label: col.name,
+                        animated: true
+                    });
                 }
             });
         });
