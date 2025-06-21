@@ -31,13 +31,19 @@ const DBNode = ({ data, selected }) => {
             {/* Header */}
             <div className="relative px-4 py-3 border-b border-slate-100/80">
                 <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${isFact ? 'bg-blue-500' : 'bg-slate-400'}`}></div>
+                    <div className="flex items-center gap-2">
+
+                        <div className={`w-2 h-2 rounded-full ${isFact
+                            ? 'bg-blue-500 shadow-lg shadow-blue-500/50 animate-pulse'
+                            : 'bg-slate-400'
+                            }`}></div>
+                    </div>
                     <h3 className="font-semibold text-slate-800 text-sm tracking-wide">{tableName}</h3>
                     <div className={`ml-auto px-2 py-1 rounded-full text-xs font-medium ${isFact
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'bg-slate-50 text-slate-600 border border-slate-200'
                         }`}>
-                        {isFact ? 'FACT' : 'DIM'}
+                        {isFact ? 'FACT ⚡' : 'DIM 📊'}
                     </div>
                 </div>
             </div>
