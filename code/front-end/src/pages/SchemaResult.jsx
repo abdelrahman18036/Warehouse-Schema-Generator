@@ -4,10 +4,11 @@ import Layout from '../components/Layout';
 import SchemaGraph from '../components/SchemaGraph';
 import SchemaEditor from '../components/SchemaEditor';
 import ExportButtons from '../components/ExportButtons';
+import ExportView from '../components/ExportView';
 import axios from 'axios';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo, FaEdit } from 'react-icons/fa';
+import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo, FaEdit, FaCode } from 'react-icons/fa';
 import { BsRobot } from "react-icons/bs";
 
 const SchemaResult = () => {
@@ -354,6 +355,16 @@ const SchemaResult = () => {
                             <span>Edit Schemas</span>
                         </button>
                         <button
+                            className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'export' ?
+                                'bg-[#2B5EE8] text-white shadow-md' :
+                                'bg-white text-gray-700 hover:bg-gray-100'
+                                }`}
+                            onClick={() => setActiveTab('export')}
+                        >
+                            <FaCode size={16} />
+                            <span>Export</span>
+                        </button>
+                        <button
                             className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'details' ?
                                 'bg-[#2B5EE8] text-white shadow-md' :
                                 'bg-white text-gray-700 hover:bg-gray-100'
@@ -536,36 +547,7 @@ const SchemaResult = () => {
                                         animate="visible"
                                         className="space-y-6"
                                     >
-                                        {/* Export Section for Edit Tab */}
-                                        <motion.div variants={itemVariants}>
-                                            <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6 mb-6">
-                                                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                                                    <FaDownload size={16} />
-                                                    Export Customized Schemas
-                                                </h3>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                    {/* Warehouse Schema Export */}
-                                                    <div className="space-y-3">
-                                                        <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wide">Warehouse Schema</h4>
-                                                        <ExportButtons
-                                                            schemaId={id}
-                                                            schemaType="warehouse"
-                                                            schemaName="Customized Warehouse Schema"
-                                                        />
-                                                    </div>
 
-                                                    {/* AI Enhanced Schema Export */}
-                                                    <div className="space-y-3">
-                                                        <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wide">AI Enhanced Schema</h4>
-                                                        <ExportButtons
-                                                            schemaId={id}
-                                                            schemaType="ai_enhanced"
-                                                            schemaName="Customized AI Enhanced Schema"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
 
                                         {/* Warehouse Schema Editor */}
                                         <motion.div variants={itemVariants}>
@@ -587,6 +569,24 @@ const SchemaResult = () => {
                                             />
                                         </motion.div>
                                     </motion.div>
+                                </motion.div>
+                            )}
+
+                            {activeTab === 'export' && (
+                                <motion.div
+                                    key="export"
+                                    variants={tabVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    className="w-full"
+                                >
+                                    <ExportView
+                                        originalSchema={originalSchema}
+                                        warehouseSchema={warehouseSchema}
+                                        aiEnhancedSchema={aiEnhancedSchema}
+                                        schemaId={id}
+                                    />
                                 </motion.div>
                             )}
 
