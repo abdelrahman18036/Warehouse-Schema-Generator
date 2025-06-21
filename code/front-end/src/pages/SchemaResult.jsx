@@ -2,10 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import SchemaGraph from '../components/SchemaGraph';
+import SchemaEditor from '../components/SchemaEditor';
 import axios from 'axios';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo } from 'react-icons/fa';
+import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo, FaEdit } from 'react-icons/fa';
 import { BsRobot } from "react-icons/bs";
 
 const SchemaResult = () => {
@@ -64,6 +65,23 @@ const SchemaResult = () => {
         original_schema: originalSchema || {},
         warehouse_schema: warehouseSchema || {},
         ai_enhanced_schema: aiEnhancedSchema || {}
+    };
+
+    // Handle schema updates from editor
+    const handleSchemaUpdate = (updatedSchema, schemaType) => {
+        if (schemaType === 'warehouse') {
+            setWarehouseSchema(updatedSchema);
+        } else if (schemaType === 'ai_enhanced') {
+            setAiEnhancedSchema(updatedSchema);
+        }
+
+        // Update combined data for graph refresh
+        if (activeTab === 'graph') {
+            // Force re-render of graph component by updating combinedData
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 100);
+        }
     };
 
     // Toggle accordion
@@ -325,6 +343,16 @@ const SchemaResult = () => {
                             <span>AI Recommendations</span>
                         </button>
                         <button
+                            className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'edit' ?
+                                'bg-[#2B5EE8] text-white shadow-md' :
+                                'bg-white text-gray-700 hover:bg-gray-100'
+                                }`}
+                            onClick={() => setActiveTab('edit')}
+                        >
+                            <FaEdit size={16} />
+                            <span>Edit Schemas</span>
+                        </button>
+                        <button
                             className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'details' ?
                                 'bg-[#2B5EE8] text-white shadow-md' :
                                 'bg-white text-gray-700 hover:bg-gray-100'
@@ -472,6 +500,44 @@ const SchemaResult = () => {
                                                 </div>
                                             </div>
                                         </Accordion>
+                                    </motion.div>
+                                </motion.div>
+                            )}
+
+                            {activeTab === 'edit' && (
+                                <motion.div
+                                    key="edit"
+                                    variants={tabVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    className="w-full"
+                                >
+                                    <motion.div
+                                        variants={containerVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        className="space-y-6"
+                                    >
+                                        {/* Warehouse Schema Editor */}
+                                        <motion.div variants={itemVariants}>
+                                            <SchemaEditor
+                                                schemaData={warehouseSchema}
+                                                schemaType="warehouse"
+                                                schemaId={id}
+                                                onSchemaUpdate={(updatedSchema) => handleSchemaUpdate(updatedSchema, 'warehouse')}
+                                            />
+                                        </motion.div>
+
+                                        {/* AI Enhanced Schema Editor */}
+                                        <motion.div variants={itemVariants}>
+                                            <SchemaEditor
+                                                schemaData={aiEnhancedSchema}
+                                                schemaType="ai_enhanced"
+                                                schemaId={id}
+                                                onSchemaUpdate={(updatedSchema) => handleSchemaUpdate(updatedSchema, 'ai_enhanced')}
+                                            />
+                                        </motion.div>
                                     </motion.div>
                                 </motion.div>
                             )}

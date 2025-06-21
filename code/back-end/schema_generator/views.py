@@ -48,11 +48,18 @@ def validate_schema_structure(schema, schema_name="schema"):
                 print(f"Error: {schema_name} table '{table_name}' column {i} is not a dictionary: {type(column)}")
                 return False
             
-            required_keys = ['name', 'type', 'constraints']
-            for key in required_keys:
-                if key not in column:
-                    print(f"Error: {schema_name} table '{table_name}' column {i} missing '{key}' key")
-                    return False
+            # Check for required keys and provide defaults
+            if 'name' not in column:
+                print(f"Error: {schema_name} table '{table_name}' column {i} missing 'name' key")
+                return False
+            
+            if 'type' not in column:
+                print(f"Error: {schema_name} table '{table_name}' column {i} missing 'type' key")
+                return False
+            
+            # Provide default empty constraints if missing
+            if 'constraints' not in column:
+                column['constraints'] = []
     
     return True
 
@@ -254,6 +261,56 @@ class WarehouseSchemaAPIView(BaseUserDatabaseAPIView):
         if user_db.warehouse_schema:
             return Response(user_db.warehouse_schema, status=status.HTTP_200_OK)
         return Response({'error': 'Warehouse schema not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, pk, format=None):
+        user_db = self.get_user_db(pk)
+        updated_schema = request.data.get('schema')
+        
+        if not updated_schema:
+            return Response({'error': 'Schema data is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate the updated schema structure
+        if not validate_schema_structure(updated_schema, "updated_warehouse_schema"):
+            return Response({'error': 'Invalid schema structure.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Process the updated schema to add pk_columns and fk_columns
+        for table_name, table_info in updated_schema.items():
+            if isinstance(table_info, dict):
+                columns = table_info.get('columns', [])
+                pk_columns = set()
+                fk_columns = set()
+                
+                if isinstance(columns, list):
+                    for column in columns:
+                        if isinstance(column, dict):
+                            constraints = column.get('constraints', [])
+                            column_name = column.get('name')
+
+                            # Normalize constraints to a list of strings
+                            if isinstance(constraints, list):
+                                constraints_list = [str(c).lower() for c in constraints]
+                            elif isinstance(constraints, str):
+                                constraints_list = [constraints.lower()]
+                            else:
+                                constraints_list = []
+
+                            # Check for primary key and foreign key constraints
+                            if any('primary key' in c for c in constraints_list):
+                                pk_columns.add(column_name)
+                            if any('foreign key' in c for c in constraints_list):
+                                fk_columns.add(column_name)
+                
+                table_info['pk_columns'] = list(pk_columns)
+                table_info['fk_columns'] = list(fk_columns)
+        
+        # Save the updated schema
+        user_db.warehouse_schema = updated_schema
+        user_db.save(update_fields=['warehouse_schema'])
+        
+        return Response({
+            'message': 'Warehouse schema updated successfully.',
+            'schema': updated_schema
+        }, status=status.HTTP_200_OK)
 
 class AIEnhancedSchemaAPIView(BaseUserDatabaseAPIView):
     def get(self, request, pk, format=None):
@@ -261,6 +318,56 @@ class AIEnhancedSchemaAPIView(BaseUserDatabaseAPIView):
         if user_db.ai_enhanced_schema:
             return Response(user_db.ai_enhanced_schema, status=status.HTTP_200_OK)
         return Response({'error': 'AI enhanced schema not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, pk, format=None):
+        user_db = self.get_user_db(pk)
+        updated_schema = request.data.get('schema')
+        
+        if not updated_schema:
+            return Response({'error': 'Schema data is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate the updated schema structure
+        if not validate_schema_structure(updated_schema, "updated_ai_enhanced_schema"):
+            return Response({'error': 'Invalid schema structure.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Process the updated schema to add pk_columns and fk_columns
+        for table_name, table_info in updated_schema.items():
+            if isinstance(table_info, dict):
+                columns = table_info.get('columns', [])
+                pk_columns = set()
+                fk_columns = set()
+                
+                if isinstance(columns, list):
+                    for column in columns:
+                        if isinstance(column, dict):
+                            constraints = column.get('constraints', [])
+                            column_name = column.get('name')
+
+                            # Normalize constraints to a list of strings
+                            if isinstance(constraints, list):
+                                constraints_list = [str(c).lower() for c in constraints]
+                            elif isinstance(constraints, str):
+                                constraints_list = [constraints.lower()]
+                            else:
+                                constraints_list = []
+
+                            # Check for primary key and foreign key constraints
+                            if any('primary key' in c for c in constraints_list):
+                                pk_columns.add(column_name)
+                            if any('foreign key' in c for c in constraints_list):
+                                fk_columns.add(column_name)
+                
+                table_info['pk_columns'] = list(pk_columns)
+                table_info['fk_columns'] = list(fk_columns)
+        
+        # Save the updated schema
+        user_db.ai_enhanced_schema = updated_schema
+        user_db.save(update_fields=['ai_enhanced_schema'])
+        
+        return Response({
+            'message': 'AI enhanced schema updated successfully.',
+            'schema': updated_schema
+        }, status=status.HTTP_200_OK)
 
 class MetadataAPIView(BaseUserDatabaseAPIView):
     def get(self, request, pk, format=None):
