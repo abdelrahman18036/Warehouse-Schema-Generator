@@ -6,7 +6,7 @@ from rest_framework import status
 from .serializers import UserDatabaseSerializer
 from .models import UserDatabase
 from .utils.schema_parsing import parse_sql_file
-# from .utils.schema_generation import generate_warehouse_schema  # No longer used
+from .utils.evaluation import evaluation_framework
 from .ai_services import (
     detect_domain_with_ai,
     suggest_missing_elements,
@@ -220,6 +220,15 @@ class UploadSchemaAPIView(APIView):
             # AI suggestions
             ai_suggestions = suggest_missing_elements(schema_details, domain)
 
+            # Perform comprehensive evaluation
+            print("🔬 Starting comprehensive schema evaluation...")
+            evaluation_results = evaluation_framework.evaluate_schemas(
+                original_schema=convert_schema_format(schema_details),
+                warehouse_schema=warehouse_schema,
+                ai_enhanced_schema=ai_enhanced_schema,
+                domain=domain
+            )
+
             # Update the user_db instance with all processed data
             user_db.original_schema = convert_schema_format(schema_details)
             user_db.warehouse_schema = warehouse_schema
@@ -227,6 +236,7 @@ class UploadSchemaAPIView(APIView):
             user_db.ai_suggestions = ai_suggestions
             user_db.missing_tables = ai_suggestions.get('missing_tables', [])
             user_db.missing_columns = ai_suggestions.get('missing_columns', [])
+            user_db.evaluation_results = evaluation_results
             user_db.save(update_fields=[
                 'original_schema',
                 'warehouse_schema',
@@ -234,6 +244,7 @@ class UploadSchemaAPIView(APIView):
                 'ai_suggestions',
                 'missing_tables',
                 'missing_columns',
+                'evaluation_results',
             ])
 
             response_data = {
@@ -379,8 +390,16 @@ class MetadataAPIView(BaseUserDatabaseAPIView):
             'ai_suggestions': user_db.ai_suggestions,
             'missing_tables': user_db.missing_tables,
             'missing_columns': user_db.missing_columns,
+            'evaluation_results': user_db.evaluation_results,
         }
         return Response(metadata, status=status.HTTP_200_OK)
+
+class EvaluationResultsAPIView(BaseUserDatabaseAPIView):
+    def get(self, request, pk, format=None):
+        user_db = self.get_user_db(pk)
+        if user_db.evaluation_results:
+            return Response(user_db.evaluation_results, status=status.HTTP_200_OK)
+        return Response({'error': 'Evaluation results not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 class ExportSchemaAPIView(APIView):
     def get_user_db(self, pk):

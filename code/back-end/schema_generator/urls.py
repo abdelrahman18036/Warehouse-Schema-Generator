@@ -7,6 +7,7 @@ from .views import (
     WarehouseSchemaAPIView,
     AIEnhancedSchemaAPIView,
     MetadataAPIView,
+    EvaluationResultsAPIView,
     ExportOriginalSchemaAPIView,
     ExportWarehouseSchemaAPIView,
     ExportAIEnhancedSchemaAPIView,
@@ -18,6 +19,7 @@ urlpatterns = [
     path('warehouse_schema/<int:pk>/', WarehouseSchemaAPIView.as_view(), name='warehouse_schema_api'),
     path('ai_enhanced_schema/<int:pk>/', AIEnhancedSchemaAPIView.as_view(), name='ai_enhanced_schema_api'),
     path('metadata/<int:pk>/', MetadataAPIView.as_view(), name='metadata_api'),
+    path('evaluation/<int:pk>/', EvaluationResultsAPIView.as_view(), name='evaluation_results_api'),
     
     # Export endpoints
     path('export/original/<int:pk>/', ExportOriginalSchemaAPIView.as_view(), name='export_original_schema'),

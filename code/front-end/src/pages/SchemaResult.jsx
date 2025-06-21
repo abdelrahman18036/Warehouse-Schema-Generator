@@ -8,7 +8,7 @@ import ExportView from '../components/ExportView';
 import axios from 'axios';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo, FaEdit, FaCode } from 'react-icons/fa';
+import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo, FaEdit, FaCode, FaChartBar } from 'react-icons/fa';
 import { BsRobot } from "react-icons/bs";
 
 const SchemaResult = () => {
@@ -20,6 +20,7 @@ const SchemaResult = () => {
     const [aiSuggestions, setAiSuggestions] = useState(null);
     const [missingTables, setMissingTables] = useState([]);
     const [missingColumns, setMissingColumns] = useState({});
+    const [evaluationResults, setEvaluationResults] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('graph');
@@ -37,12 +38,17 @@ const SchemaResult = () => {
                     originalRes,
                     warehouseRes,
                     aiEnhancedRes,
-                    metadataRes
+                    metadataRes,
+                    evaluationRes
                 ] = await Promise.all([
                     axios.get(`http://localhost:8000/api/schema/original_schema/${id}/`),
                     axios.get(`http://localhost:8000/api/schema/warehouse_schema/${id}/`),
                     axios.get(`http://localhost:8000/api/schema/ai_enhanced_schema/${id}/`),
-                    axios.get(`http://localhost:8000/api/schema/metadata/${id}/`)
+                    axios.get(`http://localhost:8000/api/schema/metadata/${id}/`),
+                    axios.get(`http://localhost:8000/api/schema/evaluation/${id}/`).catch(err => {
+                        console.warn('Evaluation results not available:', err);
+                        return { data: null };
+                    })
                 ]);
 
                 setOriginalSchema(originalRes.data);
@@ -52,6 +58,7 @@ const SchemaResult = () => {
                 setAiSuggestions(metadataRes.data.ai_suggestions || {});
                 setMissingTables(Array.isArray(metadataRes.data.missing_tables) ? metadataRes.data.missing_tables : []);
                 setMissingColumns(metadataRes.data.missing_columns || {});
+                setEvaluationResults(evaluationRes.data);
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching schema result:', err);
@@ -365,6 +372,16 @@ const SchemaResult = () => {
                             <span>Export</span>
                         </button>
                         <button
+                            className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'evaluation' ?
+                                'bg-[#2B5EE8] text-white shadow-md' :
+                                'bg-white text-gray-700 hover:bg-gray-100'
+                                }`}
+                            onClick={() => setActiveTab('evaluation')}
+                        >
+                            <FaChartBar size={16} />
+                            <span>Evaluation</span>
+                        </button>
+                        <button
                             className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'details' ?
                                 'bg-[#2B5EE8] text-white shadow-md' :
                                 'bg-white text-gray-700 hover:bg-gray-100'
@@ -587,6 +604,170 @@ const SchemaResult = () => {
                                         aiEnhancedSchema={aiEnhancedSchema}
                                         schemaId={id}
                                     />
+                                </motion.div>
+                            )}
+
+                            {activeTab === 'evaluation' && (
+                                <motion.div
+                                    key="evaluation"
+                                    variants={tabVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    className="w-full"
+                                >
+                                    {evaluationResults ? (
+                                        <motion.div
+                                            variants={containerVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            className="space-y-6"
+                                        >
+                                            {/* Header */}
+                                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
+                                                <h1 className="text-2xl font-bold mb-2">🔬 Schema Evaluation Results</h1>
+                                                <p className="opacity-90">
+                                                    Comprehensive analysis using 6 advanced algorithms for domain: <strong>{evaluationResults.domain}</strong>
+                                                </p>
+                                                <p className="text-sm opacity-75 mt-1">
+                                                    Generated: {new Date(evaluationResults.evaluation_timestamp).toLocaleString()}
+                                                </p>
+                                            </div>
+
+                                            {/* Schema Comparison */}
+                                            <div className="bg-white rounded-lg shadow-md p-6">
+                                                <h2 className="text-xl font-bold text-gray-800 mb-4">🏆 Schema Comparison & Best Recommendation</h2>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                    <div className={`p-4 rounded-lg border-2 ${evaluationResults.best_schema_recommendation.schema_type === 'warehouse'
+                                                        ? 'border-green-500 bg-green-50'
+                                                        : 'border-gray-300 bg-gray-50'
+                                                        }`}>
+                                                        <h3 className="font-semibold text-gray-800">Warehouse Schema</h3>
+                                                        <div className={`text-2xl font-bold ${evaluationResults.warehouse_schema_evaluation.overall_score >= 80 ? 'text-green-600' : evaluationResults.warehouse_schema_evaluation.overall_score >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                                                            {evaluationResults.warehouse_schema_evaluation.overall_score}%
+                                                        </div>
+                                                        <p className="text-sm text-gray-600">AI-Generated Warehouse Design</p>
+                                                    </div>
+
+                                                    <div className={`p-4 rounded-lg border-2 ${evaluationResults.best_schema_recommendation.schema_type === 'ai_enhanced'
+                                                        ? 'border-green-500 bg-green-50'
+                                                        : 'border-gray-300 bg-gray-50'
+                                                        }`}>
+                                                        <h3 className="font-semibold text-gray-800">AI Enhanced Schema</h3>
+                                                        <div className={`text-2xl font-bold ${evaluationResults.ai_enhanced_schema_evaluation.overall_score >= 80 ? 'text-green-600' : evaluationResults.ai_enhanced_schema_evaluation.overall_score >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                                                            {evaluationResults.ai_enhanced_schema_evaluation.overall_score}%
+                                                        </div>
+                                                        <p className="text-sm text-gray-600">Comprehensive Enterprise Design</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                    <h4 className="font-semibold text-blue-800 mb-2">
+                                                        🎯 Recommended Schema: {evaluationResults.best_schema_recommendation.schema_type === 'warehouse' ? 'Warehouse Schema' : 'AI Enhanced Schema'}
+                                                    </h4>
+                                                    <p className="text-blue-700 text-sm">
+                                                        <strong>Score:</strong> {evaluationResults.best_schema_recommendation.score}% | <strong>Reason:</strong> {evaluationResults.best_schema_recommendation.reason}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Algorithm Performance */}
+                                            <div className="bg-white rounded-lg shadow-md p-6">
+                                                <h2 className="text-xl font-bold text-gray-800 mb-4">📊 Algorithm Performance Comparison</h2>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {Object.keys(evaluationResults.warehouse_schema_evaluation.algorithm_scores).map((algorithmKey) => {
+                                                        const warehouse = evaluationResults.warehouse_schema_evaluation.algorithm_scores[algorithmKey];
+                                                        const aiEnhanced = evaluationResults.ai_enhanced_schema_evaluation.algorithm_scores[algorithmKey];
+
+                                                        return (
+                                                            <div key={algorithmKey} className="border rounded-lg p-4">
+                                                                <h4 className="font-semibold text-gray-800 text-sm mb-3">
+                                                                    {evaluationResults.algorithm_details[algorithmKey].name}
+                                                                </h4>
+
+                                                                <div className="space-y-2">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <span className="text-xs text-gray-600">Warehouse:</span>
+                                                                        <span className={`font-bold text-sm ${warehouse.score >= 80 ? 'text-green-600' : warehouse.score >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                                                                            {warehouse.score}%
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <div className="flex justify-between items-center">
+                                                                        <span className="text-xs text-gray-600">AI Enhanced:</span>
+                                                                        <span className={`font-bold text-sm ${aiEnhanced.score >= 80 ? 'text-green-600' : aiEnhanced.score >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                                                                            {aiEnhanced.score}%
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <div className="text-xs text-center mt-2">
+                                                                        <span className={`px-2 py-1 rounded ${aiEnhanced.score > warehouse.score
+                                                                            ? 'bg-green-100 text-green-700'
+                                                                            : aiEnhanced.score < warehouse.score
+                                                                                ? 'bg-red-100 text-red-700'
+                                                                                : 'bg-gray-100 text-gray-700'
+                                                                            }`}>
+                                                                            {aiEnhanced.score > warehouse.score
+                                                                                ? `AI +${(aiEnhanced.score - warehouse.score).toFixed(1)}`
+                                                                                : aiEnhanced.score < warehouse.score
+                                                                                    ? `Warehouse +${(warehouse.score - aiEnhanced.score).toFixed(1)}`
+                                                                                    : 'Tied'
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            {/* Recommendations */}
+                                            <div className="bg-white rounded-lg shadow-md p-6">
+                                                <h2 className="text-xl font-bold text-gray-800 mb-4">💡 Recommendations</h2>
+                                                <div className="space-y-2">
+                                                    {evaluationResults.recommendations.map((recommendation, index) => (
+                                                        <div key={index} className="flex items-start space-x-2">
+                                                            <span className="text-blue-600 font-bold text-sm">•</span>
+                                                            <span className="text-gray-700 text-sm">{recommendation}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Algorithm Explanations */}
+                                            <div className="bg-white rounded-lg shadow-md p-6">
+                                                <h2 className="text-xl font-bold text-gray-800 mb-4">🧠 Algorithm Explanations</h2>
+                                                <div className="space-y-4">
+                                                    {Object.entries(evaluationResults.algorithm_details).map(([key, algo]) => (
+                                                        <div key={key} className="border-l-4 border-blue-500 pl-4">
+                                                            <h3 className="font-semibold text-gray-800">{algo.name}</h3>
+                                                            <p className="text-gray-600 text-sm mt-1">{algo.description}</p>
+                                                            <div className="flex flex-wrap gap-1 mt-2">
+                                                                {algo.metrics.map((metric, index) => (
+                                                                    <span
+                                                                        key={index}
+                                                                        className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded"
+                                                                    >
+                                                                        {metric}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                                            <FaChartBar className="mx-auto text-gray-400 text-4xl mb-4" />
+                                            <h3 className="text-lg font-semibold text-gray-600 mb-2">Evaluation Results Not Available</h3>
+                                            <p className="text-gray-500">
+                                                Evaluation results are generated during schema processing. Please upload a new schema to see evaluation metrics.
+                                            </p>
+                                        </div>
+                                    )}
                                 </motion.div>
                             )}
 
