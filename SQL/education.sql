@@ -1,4 +1,4 @@
--- Schema for an education management system
+-- Schema for a simple education database
 
 CREATE TABLE students (
     student_id SERIAL PRIMARY KEY,
@@ -6,28 +6,14 @@ CREATE TABLE students (
     last_name VARCHAR(50),
     email VARCHAR(100),
     phone VARCHAR(20),
-    enrollment_date DATE,
-    grade_level VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE teachers (
-    teacher_id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    email VARCHAR(100),
-    phone VARCHAR(20),
-    subject VARCHAR(100),
-    hire_date DATE
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE courses (
     course_id SERIAL PRIMARY KEY,
     course_name VARCHAR(100),
-    course_code VARCHAR(20),
     credits INT,
-    teacher_id INT REFERENCES teachers(teacher_id),
-    semester VARCHAR(20)
+    instructor VARCHAR(100)
 );
 
 CREATE TABLE enrollments (
@@ -35,6 +21,13 @@ CREATE TABLE enrollments (
     student_id INT REFERENCES students(student_id),
     course_id INT REFERENCES courses(course_id),
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    grade VARCHAR(5),
     status VARCHAR(20) DEFAULT 'active'
+);
+
+CREATE TABLE grades (
+    grade_id SERIAL PRIMARY KEY,
+    enrollment_id INT REFERENCES enrollments(enrollment_id),
+    assignment_name VARCHAR(100),
+    grade DECIMAL(5, 2),
+    max_points DECIMAL(5, 2)
 ); 
