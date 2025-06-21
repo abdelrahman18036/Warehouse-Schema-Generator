@@ -647,16 +647,19 @@ const SchemaGraph = ({ data }) => {
                     nodesConnectable={false}
                     elementsSelectable={true}
                     selectNodesOnDrag={false}
-                    panOnDrag={[1, 2]}
-                    zoomOnScroll={true}
+                    panOnDrag={true}
+                    panOnScroll={true}
+                    panOnScrollMode="free"
+                    panOnScrollSpeed={1.2}
+                    zoomOnScroll={false}
                     zoomOnPinch={true}
                     zoomOnDoubleClick={false}
                     preventScrolling={false}
                     fitView
                     fitViewOptions={{ padding: 0.2 }}
                     defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
-                    minZoom={0.3}
-                    maxZoom={1.5}
+                    minZoom={0.2}
+                    maxZoom={2.0}
                     nodeTypes={nodeTypes}
                     className="bg-transparent"
                     proOptions={{ hideAttribution: true }}
