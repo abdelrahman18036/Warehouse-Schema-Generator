@@ -165,11 +165,9 @@ const SchemaGraph = ({ data }) => {
             const table = schema[tableName];
             // Enhanced fact table detection for warehouse and AI schemas only
             const lowerName = tableName.toLowerCase();
-            const isFactByName = lowerName.includes('fact') ||
-                lowerName.includes('sales') ||
-                lowerName.includes('transaction') ||
-                lowerName.includes('order') ||
-                lowerName.includes('event');
+            const isFactByName = lowerName.includes('fact_');
+
+
 
             // Count foreign keys
             let fkCount = 0;
@@ -185,7 +183,7 @@ const SchemaGraph = ({ data }) => {
                 }).length;
             }
 
-            return isFactByName || fkCount > 2;
+            return isFactByName;
         });
     }, [schema, selectedSchemaKey]);
 

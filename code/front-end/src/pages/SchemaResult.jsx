@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import SchemaGraph from '../components/SchemaGraph';
 import SchemaEditor from '../components/SchemaEditor';
+import ExportButtons from '../components/ExportButtons';
 import axios from 'axios';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -386,10 +387,14 @@ const SchemaResult = () => {
                                     >
                                         <div className="flex justify-between items-center mb-4 px-2">
                                             <h3 className="text-xl font-semibold text-gray-800">Schema Visualization</h3>
-                                            <div className="bg-blue-50 text-[#2B5EE8] px-3 py-1 rounded-full text-sm font-medium">
-                                                Interactive
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-blue-50 text-[#2B5EE8] px-3 py-1 rounded-full text-sm font-medium">
+                                                    Interactive
+                                                </div>
                                             </div>
                                         </div>
+
+
                                         <ErrorBoundary>
                                             <div className="w-full h-[600px] rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
                                                 <SchemaGraph data={combinedData} />
@@ -531,6 +536,37 @@ const SchemaResult = () => {
                                         animate="visible"
                                         className="space-y-6"
                                     >
+                                        {/* Export Section for Edit Tab */}
+                                        <motion.div variants={itemVariants}>
+                                            <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6 mb-6">
+                                                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                                                    <FaDownload size={16} />
+                                                    Export Customized Schemas
+                                                </h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    {/* Warehouse Schema Export */}
+                                                    <div className="space-y-3">
+                                                        <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wide">Warehouse Schema</h4>
+                                                        <ExportButtons
+                                                            schemaId={id}
+                                                            schemaType="warehouse"
+                                                            schemaName="Customized Warehouse Schema"
+                                                        />
+                                                    </div>
+
+                                                    {/* AI Enhanced Schema Export */}
+                                                    <div className="space-y-3">
+                                                        <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wide">AI Enhanced Schema</h4>
+                                                        <ExportButtons
+                                                            schemaId={id}
+                                                            schemaType="ai_enhanced"
+                                                            schemaName="Customized AI Enhanced Schema"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+
                                         {/* Warehouse Schema Editor */}
                                         <motion.div variants={itemVariants}>
                                             <SchemaEditor
@@ -644,6 +680,45 @@ const SchemaResult = () => {
                                                     </div>
                                                 </div>
                                             )}
+                                        </Accordion>
+
+                                        {/* Export Section */}
+                                        <Accordion
+                                            id="export-schemas"
+                                            title="Export Schemas"
+                                            icon={<FaDownload size={20} />}
+                                        >
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                {/* Original Schema Export */}
+                                                <div className="space-y-3">
+                                                    <h5 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Original Schema</h5>
+                                                    <ExportButtons
+                                                        schemaId={id}
+                                                        schemaType="original"
+                                                        schemaName="Original Schema"
+                                                    />
+                                                </div>
+
+                                                {/* Warehouse Schema Export */}
+                                                <div className="space-y-3">
+                                                    <h5 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Warehouse Schema</h5>
+                                                    <ExportButtons
+                                                        schemaId={id}
+                                                        schemaType="warehouse"
+                                                        schemaName="Warehouse Schema"
+                                                    />
+                                                </div>
+
+                                                {/* AI Enhanced Schema Export */}
+                                                <div className="space-y-3">
+                                                    <h5 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">AI Enhanced Schema</h5>
+                                                    <ExportButtons
+                                                        schemaId={id}
+                                                        schemaType="ai_enhanced"
+                                                        schemaName="AI Enhanced Schema"
+                                                    />
+                                                </div>
+                                            </div>
                                         </Accordion>
                                     </motion.div>
                                 </motion.div>
