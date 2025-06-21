@@ -582,7 +582,7 @@ const SchemaGraph = ({ data }) => {
             <div className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200">
                 <div className="flex items-center space-x-4">
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        Database Schema Visualization
+                        Schema Visualization
                     </h2>
                     <div className="flex items-center space-x-2 text-sm text-slate-600">
                         <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
