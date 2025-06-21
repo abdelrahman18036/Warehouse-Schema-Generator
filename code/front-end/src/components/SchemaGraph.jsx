@@ -251,7 +251,7 @@ const SchemaGraph = ({ data }) => {
                 // Format columns for display
                 const columns = Array.isArray(table.columns) ? table.columns.map(col => {
                     if (!col.name || !col.type) return '';
-                    let display = `${col.name}: ${col.type}`;
+                    let display = `• ${col.name}: ${col.type}`;
                     if (col.constraints && Array.isArray(col.constraints) && col.constraints.length > 0) {
                         const constraintStr = col.constraints.filter(c => c && c.trim()).join(', ');
                         if (constraintStr) display += ` (${constraintStr})`;
@@ -259,8 +259,8 @@ const SchemaGraph = ({ data }) => {
                     return display;
                 }).filter(Boolean).join('\n') : 'No columns';
 
-                const displayText = columns.length > 300 ?
-                    columns.substring(0, 300) + '...' : columns;
+                const displayText = columns.length > 400 ?
+                    columns.substring(0, 400) + '...' : columns;
 
                 // Consistent node configuration for all tables
                 nodesArray.push({
@@ -274,33 +274,31 @@ const SchemaGraph = ({ data }) => {
                     selectable: true,
                     deletable: false,
                     connectable: false,
+                    sourcePosition: 'right',
+                    targetPosition: 'left',
                     style: {
                         background: isFact
                             ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)'
-                            : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+                            : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%)',
                         color: isFact ? '#ffffff' : '#1e293b',
                         border: isFact
                             ? '3px solid #2563eb'
                             : '3px solid #94a3b8',
-                        borderRadius: '20px',
-                        width: 320,
+                        borderRadius: '18px',
+                        width: 300,
                         minHeight: 140,
-                        padding: '24px',
+                        padding: '20px',
                         fontSize: '13px',
                         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-                        fontWeight: '600',
-                        lineHeight: '1.4',
+                        fontWeight: '500',
+                        lineHeight: '1.45',
                         textAlign: 'left',
                         whiteSpace: 'pre-wrap',
                         boxShadow: isFact
-                            ? '0 25px 50px -12px rgba(59, 130, 246, 0.4), 0 8px 16px -8px rgba(59, 130, 246, 0.3)'
-                            : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                            ? '0 20px 40px -12px rgba(59, 130, 246, 0.35)'
+                            : '0 8px 20px -8px rgba(0, 0, 0, 0.12)',
                         cursor: 'grab',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        backdropFilter: 'blur(12px)',
-                        WebkitBackdropFilter: 'blur(12px)',
                         userSelect: 'none',
-                        position: 'relative',
                     },
                 });
             });
@@ -312,22 +310,25 @@ const SchemaGraph = ({ data }) => {
                     id: conn.id,
                     source: conn.source,
                     target: conn.target,
+                    sourceHandle: 'right',
+                    targetHandle: 'left',
                     animated: true,
                     label: conn.label,
-                    type: 'smoothstep',
+                    type: 'step',
                     style: {
                         stroke: '#6366f1',
                         strokeWidth: 3,
+                        strokeDasharray: '4 4'
                     },
                     labelStyle: {
-                        fill: '#1e293b',
+                        fill: '#334155',
                         fontWeight: 600,
                         fontSize: '12px',
                         fontFamily: "'Inter', sans-serif",
                     },
                     labelBgStyle: {
                         fill: 'rgba(255, 255, 255, 0.9)',
-                        stroke: '#e2e8f0',
+                        stroke: '#cbd5e1',
                         strokeWidth: 1,
                         opacity: 0.9,
                         rx: 8,
