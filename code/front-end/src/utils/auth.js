@@ -143,8 +143,8 @@ export const protectedAPI = {
     return handleResponse(response);
   },
 
-  getUserSchemas: async (page = 1, domain = "") => {
-    const params = new URLSearchParams({ page, page_size: 10 });
+  getUserSchemas: async (page = 1, domain = "", pageSize = 10) => {
+    const params = new URLSearchParams({ page, page_size: pageSize });
     if (domain) params.append("domain", domain);
 
     const response = await fetch(

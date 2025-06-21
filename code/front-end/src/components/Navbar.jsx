@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaRocket, FaDatabase, FaUserCircle, FaChevronDown, FaBars, FaTimes, FaChartLine, FaSignOutAlt } from "react-icons/fa";
+import { FaRocket, FaDatabase, FaUserCircle, FaChevronDown, FaBars, FaTimes, FaChartLine, FaSignOutAlt, FaList } from "react-icons/fa";
 import { isAuthenticated, getCurrentUser, logout } from "../utils/auth";
 
 const Navbar = () => {
@@ -204,6 +204,10 @@ const Navbar = () => {
                 Dashboard
               </AnimatedLink>
 
+              <AnimatedLink to="/all-schemas" icon={<FaList size={14} />}>
+                All Schemas
+              </AnimatedLink>
+
               <div className="flex items-center gap-2 text-gray-700">
                 <FaUserCircle size={16} />
                 <span className="text-sm">
@@ -294,6 +298,10 @@ const Navbar = () => {
                 <>
                   <AnimatedLink to="/dashboard" icon={<FaChartLine size={14} />}>
                     Dashboard
+                  </AnimatedLink>
+
+                  <AnimatedLink to="/all-schemas" icon={<FaList size={14} />}>
+                    All Schemas
                   </AnimatedLink>
 
                   <div className="flex items-center gap-2 text-gray-700 py-2">

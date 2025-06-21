@@ -321,7 +321,7 @@ const Dashboard = () => {
                             <h2 className="text-xl font-bold text-gray-800">Recent Schemas</h2>
                         </div>
                         <Link
-                            to="/dashboard/schemas"
+                            to="/all-schemas"
                             className="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium hover:bg-blue-50 px-3 py-2 rounded-lg transition-all duration-200"
                         >
                             View All <FaArrowRight className="ml-1" />

@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import UploadSchema from "./pages/UploadSchema";
 import SchemaResult from "./pages/SchemaResult";
 import Dashboard from "./pages/Dashboard";
+import AllSchemas from "./pages/AllSchemas";
 import "../src/assets/style/main.css";
 import Cursor from "./components/Cursor";
 import Login from "./components/Login";
@@ -58,6 +59,11 @@ function App() {
             <Route path="/result/:id" element={
               <ProtectedRoute>
                 <SchemaResult />
+              </ProtectedRoute>
+            } />
+            <Route path="/all-schemas" element={
+              <ProtectedRoute>
+                <AllSchemas />
               </ProtectedRoute>
             } />
           </Routes>
