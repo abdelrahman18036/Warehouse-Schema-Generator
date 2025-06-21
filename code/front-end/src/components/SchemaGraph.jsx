@@ -324,10 +324,33 @@ const SchemaGraph = ({ data }) => {
 
             if (totalTables === 0) return { nodes: [], edges: [] };
 
-            // Improved positioning algorithm
+            const NODE_WIDTH = 340; // widened assumed node footprint
+            const NODE_HEIGHT = 230; // heightened assumed node footprint
             const centerX = 600;
             const centerY = 400;
-            const baseRadius = Math.max(350, totalTables * 45);
+
+            // ----- Helper to calculate radius needed for N nodes given spacing ----- //
+            const calcRadius = (count, spacing) => {
+                if (count <= 1) return 0;
+                const circumference = count * spacing;
+                return (circumference) / (2 * Math.PI);
+            };
+
+            // Radius for fact circle (inner)
+            const factRadius = factTables.length <= 1
+                ? 0
+                : Math.max(300, calcRadius(factTables.length, NODE_WIDTH * 1.3)); // 30% extra spacing
+
+            // Base radius for first dimension ring – at least one whole node-height outside fact circle
+            const baseDimRadius = Math.max(
+                factRadius + NODE_HEIGHT * 2.0, // bigger buffer between fact and first dim ring
+                calcRadius(Math.min(dimensionTables.length, 8), NODE_WIDTH * 1.4) // if many dims, base ring uses spacing*1.4
+            );
+
+            // If there are many dimension tables, distribute across multiple rings (max 12 per ring)
+            const dimsPerRing = 8; // fewer nodes per ring for more spacing
+            const ringGap = NODE_HEIGHT * 1.8; // larger gap between rings
+            // ----------------------------------------------------------------------- //
 
             tableNames.forEach((tableName, index) => {
                 const table = schema[tableName];
@@ -335,39 +358,33 @@ const SchemaGraph = ({ data }) => {
 
                 let x, y;
 
-                // Consistent positioning for all nodes
-                if (totalTables === 1) {
-                    // Single table in center
-                    x = centerX;
-                    y = centerY;
-                } else if (isFact && factTables.length > 0) {
-                    // Place fact tables in inner circle or center
-                    const factIndex = factTables.indexOf(tableName);
+                if (isFact) {
                     if (factTables.length === 1) {
                         x = centerX;
                         y = centerY;
                     } else {
-                        const factRadius = Math.min(200, baseRadius * 0.4);
+                        const factIndex = factTables.indexOf(tableName);
                         const angle = (2 * Math.PI / factTables.length) * factIndex;
                         x = centerX + factRadius * Math.cos(angle);
                         y = centerY + factRadius * Math.sin(angle);
                     }
                 } else {
-                    // Place dimension tables in outer circle
                     const dimIndex = dimensionTables.indexOf(tableName);
-                    const totalDimensions = dimensionTables.length;
-                    if (totalDimensions > 0) {
-                        const angle = (2 * Math.PI / totalDimensions) * dimIndex;
-                        const radius = baseRadius;
-                        x = centerX + radius * Math.cos(angle);
-                        y = centerY + radius * Math.sin(angle);
-                    } else {
-                        // Fallback positioning
-                        const angle = (2 * Math.PI / totalTables) * index;
-                        x = centerX + baseRadius * Math.cos(angle);
-                        y = centerY + baseRadius * Math.sin(angle);
-                    }
+                    const ringIndex = Math.floor(dimIndex / dimsPerRing);
+                    const indexInRing = dimIndex % dimsPerRing;
+                    const totalInRing = Math.min(dimsPerRing, dimensionTables.length - ringIndex * dimsPerRing);
+
+                    const radius = baseDimRadius + ringIndex * ringGap;
+                    // Offset each subsequent ring slightly to avoid radial alignment
+                    const angleOffset = ringIndex * (Math.PI / dimsPerRing);
+                    const angle = (2 * Math.PI / totalInRing) * indexInRing + angleOffset;
+
+                    x = centerX + radius * Math.cos(angle);
+                    y = centerY + radius * Math.sin(angle);
                 }
+
+                x = Math.round(x);
+                y = Math.round(y);
 
                 // Format columns for display
                 const columns = Array.isArray(table.columns) ? table.columns.map(col => {
@@ -380,10 +397,8 @@ const SchemaGraph = ({ data }) => {
                     return display;
                 }).filter(Boolean).join('\n') : 'No columns';
 
-                const displayText = columns.length > 400 ?
-                    columns.substring(0, 400) + '...' : columns;
+                const displayText = columns.length > 400 ? columns.substring(0, 400) + '...' : columns;
 
-                // Consistent node configuration for all tables
                 nodesArray.push({
                     id: tableName,
                     type: 'dbNode',
@@ -392,7 +407,7 @@ const SchemaGraph = ({ data }) => {
                         columns: table.columns || [],
                         isFact
                     },
-                    position: { x: Math.round(x), y: Math.round(y) },
+                    position: { x, y },
                     draggable: true,
                     selectable: true,
                     deletable: false,
@@ -404,9 +419,7 @@ const SchemaGraph = ({ data }) => {
                             ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)'
                             : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%)',
                         color: isFact ? '#ffffff' : '#1e293b',
-                        border: isFact
-                            ? '3px solid #2563eb'
-                            : '3px solid #94a3b8',
+                        border: isFact ? '3px solid #2563eb' : '3px solid #94a3b8',
                         borderRadius: '18px',
                         width: 300,
                         minHeight: 140,

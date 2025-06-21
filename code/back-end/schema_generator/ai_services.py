@@ -268,7 +268,7 @@ def map_names_with_ai(names_list, domain, name_type='table'):
         if name not in mapping:
             mapping[name] = name
     
-    return mapping
+            return mapping
 
 def suggest_missing_elements(schema_details, domain):
     """
@@ -320,7 +320,7 @@ def suggest_missing_elements(schema_details, domain):
     if "missing_columns" not in suggestions:
         suggestions["missing_columns"] = []
     
-    return suggestions
+        return suggestions
 
 def generate_warehouse_schema_with_ai(schema_details, domain):
     """
