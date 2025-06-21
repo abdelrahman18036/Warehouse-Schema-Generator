@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import UploadSchema from "./pages/UploadSchema";
 import SchemaResult from "./pages/SchemaResult";
+import Dashboard from "./pages/Dashboard";
 import "../src/assets/style/main.css";
 import Cursor from "./components/Cursor";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Features from "./components/Features";
 import PreLoader from "./components/PreLoader";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
 
 function App() {
@@ -41,8 +43,23 @@ function App() {
             <Route path="/features" element={<Features />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/upload" element={<UploadSchema />} />
-            <Route path="/result/:id" element={<SchemaResult />} />
+
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/upload" element={
+              <ProtectedRoute>
+                <UploadSchema />
+              </ProtectedRoute>
+            } />
+            <Route path="/result/:id" element={
+              <ProtectedRoute>
+                <SchemaResult />
+              </ProtectedRoute>
+            } />
           </Routes>
         </Router>
       </body>

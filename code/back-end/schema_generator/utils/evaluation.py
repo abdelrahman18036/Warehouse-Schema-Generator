@@ -1653,3 +1653,20 @@ class SchemaEvaluationFramework:
 
 # Global instance for easy access
 evaluation_framework = SchemaEvaluationFramework() 
+
+# Standalone function for easy import
+def evaluate_schemas(original_schema: Dict, warehouse_schema: Dict, ai_enhanced_schema: Dict, domain: str = 'general') -> Dict:
+    """
+    Standalone function to evaluate schemas using the SchemaEvaluationFramework.
+    
+    Args:
+        original_schema: The uploaded original schema
+        warehouse_schema: AI-generated warehouse schema
+        ai_enhanced_schema: AI-enhanced enterprise schema
+        domain: Business domain context (default: 'general')
+        
+    Returns:
+        Dict: Comprehensive evaluation results with scores and recommendations
+    """
+    evaluator = SchemaEvaluationFramework()
+    return evaluator.evaluate_schemas(original_schema, warehouse_schema, ai_enhanced_schema, domain)

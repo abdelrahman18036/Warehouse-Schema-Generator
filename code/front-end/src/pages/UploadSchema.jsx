@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import Layout from '../components/Layout';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import PreloadOverlay from '../components/PreloadOverlay';
 import { FaDatabase, FaUpload, FaFileCode, FaArrowRight, FaFileUpload } from 'react-icons/fa';
+import { protectedAPI } from '../utils/auth';
 
 const UploadSchema = () => {
     const [name, setName] = useState('');
@@ -13,7 +13,7 @@ const UploadSchema = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
-    const [cancelTokenSource, setCancelTokenSource] = useState(null);
+
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
@@ -35,44 +35,33 @@ const UploadSchema = () => {
         setCurrentStep(1);
 
         const formData = new FormData();
-        formData.append('name', name);
+        formData.append('schema_name', name);
         formData.append('schema_file', schemaFile);
-        formData.append('domain', domain);
-
-        const source = axios.CancelToken.source();
-        setCancelTokenSource(source);
+        if (domain !== 'Auto-detect') {
+            formData.append('domain', domain);
+        }
 
         try {
-            const uploadRes = await axios.post('http://localhost:8000/api/schema/upload/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                cancelToken: source.token,
-            });
-            
+            setCurrentStep(2);
+            const uploadRes = await protectedAPI.generateSchema(formData);
+
             setCurrentStep(4);
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             setIsLoading(false);
-            const { id } = uploadRes.data;
-            navigate(`/result/${id}`);
+            const schemaId = uploadRes.data.id;
+            navigate(`/result/${schemaId}`);
         } catch (err) {
-            if (axios.isCancel(err)) {
-                console.log('Upload canceled by user');
-            } else {
-                setError(err.response ? err.response.data : { message: 'Error uploading schema' });
-            }
+            console.error('Upload error:', err);
+            setError({ message: err.message || 'Error uploading schema' });
             setIsLoading(false);
             setCurrentStep(0);
         }
     };
 
     const handleCancel = () => {
-        if (cancelTokenSource) {
-            cancelTokenSource.cancel('User canceled the upload.');
-            setIsLoading(false);
-            setCurrentStep(0);
-        }
+        setIsLoading(false);
+        setCurrentStep(0);
     };
 
     const handleFileChange = (e) => {
@@ -99,7 +88,7 @@ const UploadSchema = () => {
     const handleDrop = (e) => {
         e.preventDefault();
         setIsDragging(false);
-        
+
         const file = e.dataTransfer.files[0];
         if (file) {
             if (file.name.endsWith('.sql')) {
@@ -138,11 +127,11 @@ const UploadSchema = () => {
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <motion.div
                         className="absolute top-20 right-[10%] w-64 h-64 bg-blue-100 rounded-full opacity-30 blur-3xl"
-                        animate={{ 
+                        animate={{
                             y: [0, 20, 0],
                             scale: [1, 1.1, 1],
                         }}
-                        transition={{ 
+                        transition={{
                             repeat: Infinity,
                             duration: 15,
                             ease: "easeInOut"
@@ -150,18 +139,18 @@ const UploadSchema = () => {
                     />
                     <motion.div
                         className="absolute bottom-20 left-[5%] w-96 h-96 bg-blue-200 rounded-full opacity-20 blur-3xl"
-                        animate={{ 
+                        animate={{
                             y: [0, -30, 0],
                             scale: [1, 1.15, 1],
                         }}
-                        transition={{ 
+                        transition={{
                             repeat: Infinity,
                             duration: 20,
                             ease: "easeInOut"
                         }}
                     />
                 </div>
-                
+
                 <div className="w-full max-w-2xl relative z-10">
                     <motion.div
                         className="text-center mb-8"
@@ -174,7 +163,7 @@ const UploadSchema = () => {
                             Transform your database into an optimized data warehouse with our AI-powered system
                         </p>
                     </motion.div>
-                    
+
                     <motion.div
                         className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100"
                         initial={{ y: 20, opacity: 0 }}
@@ -201,14 +190,13 @@ const UploadSchema = () => {
                                     whileFocus={{ scale: 1.01 }}
                                 />
                             </div>
-                            
+
                             {/* File Upload */}
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">SQL Schema File</label>
                                 <motion.div
-                                    className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 ${
-                                        isDragging ? 'border-[#2B5EE8] bg-blue-50' : schemaFile ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-[#2B5EE8] hover:bg-blue-50'
-                                    }`}
+                                    className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 ${isDragging ? 'border-[#2B5EE8] bg-blue-50' : schemaFile ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-[#2B5EE8] hover:bg-blue-50'
+                                        }`}
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
                                     onDrop={handleDrop}
@@ -223,7 +211,7 @@ const UploadSchema = () => {
                                         accept=".sql"
                                         onChange={handleFileChange}
                                     />
-                                    
+
                                     {schemaFile ? (
                                         <>
                                             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-3">
@@ -231,7 +219,7 @@ const UploadSchema = () => {
                                             </div>
                                             <p className="text-sm font-medium text-gray-900 mb-1">{schemaFile.name}</p>
                                             <p className="text-xs text-gray-500 mb-2">{(schemaFile.size / 1024).toFixed(2)} KB</p>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 className="text-xs text-[#2B5EE8] hover:underline"
                                                 onClick={(e) => {
@@ -254,7 +242,7 @@ const UploadSchema = () => {
                                     )}
                                 </motion.div>
                             </div>
-                            
+
                             {/* Domain Selection */}
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">Domain</label>
@@ -273,13 +261,13 @@ const UploadSchema = () => {
                                     </motion.select>
                                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500">
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                     </div>
                                 </div>
                                 <p className="mt-2 text-xs text-gray-500">Select the domain that best matches your database schema</p>
                             </div>
-                            
+
                             {/* Submit Button */}
                             <motion.button
                                 type="submit"
@@ -317,8 +305,8 @@ const UploadSchema = () => {
                                     <div>
                                         <p className="font-medium">There was an error with your submission</p>
                                         <p className="mt-1 text-sm">
-                                            {typeof error === 'object' ? 
-                                                (error.message || JSON.stringify(error, null, 2)) : 
+                                            {typeof error === 'object' ?
+                                                (error.message || JSON.stringify(error, null, 2)) :
                                                 error}
                                         </p>
                                     </div>

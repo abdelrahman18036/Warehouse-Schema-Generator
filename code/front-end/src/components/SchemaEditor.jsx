@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaSave, FaTimes, FaPlus, FaTrash, FaDatabase, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
+import { tokenManager } from '../utils/auth';
 
 const SchemaEditor = ({ schemaData, schemaType, schemaId, onSchemaUpdate }) => {
     const [editingSchema, setEditingSchema] = useState({});
@@ -136,9 +137,15 @@ const SchemaEditor = ({ schemaData, schemaType, schemaId, onSchemaUpdate }) => {
                 ? `http://localhost:8000/api/schema/warehouse_schema/${schemaId}/`
                 : `http://localhost:8000/api/schema/ai_enhanced_schema/${schemaId}/`;
 
+            // Create headers with authentication
+            const headers = {
+                'Authorization': `Bearer ${tokenManager.getAccessToken()}`,
+                'Content-Type': 'application/json'
+            };
+
             const response = await axios.put(endpoint, {
                 schema: cleanedSchema
-            });
+            }, { headers });
 
             setMessage({ type: 'success', text: 'Schema saved successfully!' });
 

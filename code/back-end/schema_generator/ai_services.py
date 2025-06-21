@@ -730,6 +730,130 @@ def generate_full_detailed_ai_warehouse(schema_details, domain):
     print(f"Successfully parsed full detailed AI warehouse with {len(enhanced_schema)} tables")
     return enhanced_schema
 
+def generate_ai_suggestions(schema_details):
+    """
+    Main function that generates warehouse schema, AI enhanced schema, and detects domain.
+    This is the primary interface used by views.py for schema generation.
+    
+    Args:
+        schema_details (dict): The original schema dictionary with tables and columns
+        
+    Returns:
+        dict: Contains warehouse_schema, ai_enhanced_schema, domain, and other AI suggestions
+    """
+    try:
+        # Detect domain
+        domain = detect_domain_with_ai(schema_details)
+        if not domain or domain.lower() in ['unknown', 'general', '']:
+            domain = "general business"
+        
+        print(f"Detected domain: {domain}")
+        
+        # Generate warehouse schema
+        warehouse_schema = generate_warehouse_schema_with_ai(schema_details, domain)
+        
+        # Generate AI enhanced schema (more comprehensive)
+        ai_enhanced_schema = generate_full_detailed_ai_warehouse(schema_details, domain)
+        
+        # Generate additional suggestions
+        missing_elements = suggest_missing_elements(schema_details, domain)
+        
+        return {
+            'domain': domain,
+            'warehouse_schema': warehouse_schema,
+            'ai_enhanced_schema': ai_enhanced_schema,
+            'missing_tables': missing_elements.get('missing_tables', []),
+            'missing_columns': missing_elements.get('missing_columns', []),
+            'suggestions': {
+                'domain_detected': domain,
+                'warehouse_tables_count': len(warehouse_schema),
+                'ai_enhanced_tables_count': len(ai_enhanced_schema),
+                'recommendations': f"Based on {domain} industry best practices, we've created a comprehensive data warehouse design."
+            }
+        }
+        
+    except Exception as e:
+        print(f"Error in generate_ai_suggestions: {e}")
+        
+        # Fallback response
+        return {
+            'domain': 'general business',
+            'warehouse_schema': {
+                'fact_transactions': {
+                    'columns': [
+                        {'name': 'transaction_id', 'type': 'BIGINT', 'constraints': ['PRIMARY KEY', 'AUTO_INCREMENT']},
+                        {'name': 'amount', 'type': 'DECIMAL(12,2)', 'constraints': ['NOT NULL']},
+                        {'name': 'transaction_date', 'type': 'TIMESTAMP', 'constraints': ['DEFAULT CURRENT_TIMESTAMP']}
+                    ]
+                },
+                'dim_customer': {
+                    'columns': [
+                        {'name': 'customer_key', 'type': 'INTEGER', 'constraints': ['PRIMARY KEY', 'AUTO_INCREMENT']},
+                        {'name': 'customer_name', 'type': 'VARCHAR(255)', 'constraints': ['NOT NULL']}
+                    ]
+                }
+            },
+            'ai_enhanced_schema': {
+                'fact_sales_transactions': {
+                    'columns': [
+                        {'name': 'transaction_key', 'type': 'BIGINT', 'constraints': ['PRIMARY KEY', 'AUTO_INCREMENT']},
+                        {'name': 'customer_key', 'type': 'INTEGER', 'constraints': ['FOREIGN KEY']},
+                        {'name': 'product_key', 'type': 'INTEGER', 'constraints': ['FOREIGN KEY']},
+                        {'name': 'date_key', 'type': 'INTEGER', 'constraints': ['FOREIGN KEY']},
+                        {'name': 'transaction_amount', 'type': 'DECIMAL(15,2)', 'constraints': ['NOT NULL']},
+                        {'name': 'quantity', 'type': 'INTEGER', 'constraints': ['NOT NULL']},
+                        {'name': 'created_date', 'type': 'TIMESTAMP', 'constraints': ['DEFAULT CURRENT_TIMESTAMP']}
+                    ]
+                },
+                'fact_daily_summary': {
+                    'columns': [
+                        {'name': 'summary_key', 'type': 'BIGINT', 'constraints': ['PRIMARY KEY', 'AUTO_INCREMENT']},
+                        {'name': 'date_key', 'type': 'INTEGER', 'constraints': ['FOREIGN KEY']},
+                        {'name': 'total_amount', 'type': 'DECIMAL(15,2)', 'constraints': ['NOT NULL']},
+                        {'name': 'total_count', 'type': 'INTEGER', 'constraints': ['NOT NULL']}
+                    ]
+                },
+                'dim_customer': {
+                    'columns': [
+                        {'name': 'customer_key', 'type': 'INTEGER', 'constraints': ['PRIMARY KEY', 'AUTO_INCREMENT']},
+                        {'name': 'customer_id', 'type': 'VARCHAR(50)', 'constraints': ['NOT NULL', 'UNIQUE']},
+                        {'name': 'customer_name', 'type': 'VARCHAR(255)', 'constraints': ['NOT NULL']},
+                        {'name': 'customer_segment', 'type': 'VARCHAR(50)', 'constraints': []},
+                        {'name': 'effective_date', 'type': 'DATE', 'constraints': ['NOT NULL']},
+                        {'name': 'is_current', 'type': 'BOOLEAN', 'constraints': ['DEFAULT TRUE']}
+                    ]
+                },
+                'dim_product': {
+                    'columns': [
+                        {'name': 'product_key', 'type': 'INTEGER', 'constraints': ['PRIMARY KEY', 'AUTO_INCREMENT']},
+                        {'name': 'product_id', 'type': 'VARCHAR(50)', 'constraints': ['NOT NULL', 'UNIQUE']},
+                        {'name': 'product_name', 'type': 'VARCHAR(255)', 'constraints': ['NOT NULL']},
+                        {'name': 'category', 'type': 'VARCHAR(100)', 'constraints': []},
+                        {'name': 'price', 'type': 'DECIMAL(10,2)', 'constraints': ['NOT NULL']}
+                    ]
+                },
+                'dim_date': {
+                    'columns': [
+                        {'name': 'date_key', 'type': 'INTEGER', 'constraints': ['PRIMARY KEY']},
+                        {'name': 'full_date', 'type': 'DATE', 'constraints': ['NOT NULL', 'UNIQUE']},
+                        {'name': 'year', 'type': 'INTEGER', 'constraints': ['NOT NULL']},
+                        {'name': 'quarter', 'type': 'INTEGER', 'constraints': ['NOT NULL']},
+                        {'name': 'month', 'type': 'INTEGER', 'constraints': ['NOT NULL']},
+                        {'name': 'day', 'type': 'INTEGER', 'constraints': ['NOT NULL']},
+                        {'name': 'day_of_week', 'type': 'INTEGER', 'constraints': ['NOT NULL']},
+                        {'name': 'is_weekend', 'type': 'BOOLEAN', 'constraints': ['DEFAULT FALSE']}
+                    ]
+                }
+            },
+            'missing_tables': [],
+            'missing_columns': [],
+            'suggestions': {
+                'domain_detected': 'general business',
+                'warehouse_tables_count': 2,
+                'ai_enhanced_tables_count': 4,
+                'recommendations': 'Fallback schema generated due to processing error.'
+            }
+        }
 
 # # Initialize LangChain LLM with OpenAI GPT
 # llm = ChatOpenAI(model_name="gpt-4", openai_api_key=API_KEY)

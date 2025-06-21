@@ -10,9 +10,12 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaDatabase, FaTable, FaColumns, FaLightbulb, FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck, FaInfo, FaEdit, FaCode, FaChartBar } from 'react-icons/fa';
 import { BsRobot } from "react-icons/bs";
+import { tokenManager, isAuthenticated } from '../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 const SchemaResult = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [originalSchema, setOriginalSchema] = useState(null);
     const [warehouseSchema, setWarehouseSchema] = useState(null);
     const [aiEnhancedSchema, setAiEnhancedSchema] = useState(null);
@@ -31,9 +34,22 @@ const SchemaResult = () => {
     const resultRef = useRef(null);
 
     useEffect(() => {
+        // Check authentication first
+        if (!isAuthenticated()) {
+            navigate('/login');
+            return;
+        }
+
         const fetchData = async () => {
             try {
                 setLoading(true);
+
+                // Create headers with authentication
+                const headers = {
+                    'Authorization': `Bearer ${tokenManager.getAccessToken()}`,
+                    'Content-Type': 'application/json'
+                };
+
                 const [
                     originalRes,
                     warehouseRes,
@@ -41,11 +57,11 @@ const SchemaResult = () => {
                     metadataRes,
                     evaluationRes
                 ] = await Promise.all([
-                    axios.get(`http://localhost:8000/api/schema/original_schema/${id}/`),
-                    axios.get(`http://localhost:8000/api/schema/warehouse_schema/${id}/`),
-                    axios.get(`http://localhost:8000/api/schema/ai_enhanced_schema/${id}/`),
-                    axios.get(`http://localhost:8000/api/schema/metadata/${id}/`),
-                    axios.get(`http://localhost:8000/api/schema/evaluation/${id}/`).catch(err => {
+                    axios.get(`http://localhost:8000/api/schema/original_schema/${id}/`, { headers }),
+                    axios.get(`http://localhost:8000/api/schema/warehouse_schema/${id}/`, { headers }),
+                    axios.get(`http://localhost:8000/api/schema/ai_enhanced_schema/${id}/`, { headers }),
+                    axios.get(`http://localhost:8000/api/schema/metadata/${id}/`, { headers }),
+                    axios.get(`http://localhost:8000/api/schema/evaluation/${id}/`, { headers }).catch(err => {
                         console.warn('Evaluation results not available:', err);
                         return { data: null };
                     })
@@ -68,7 +84,7 @@ const SchemaResult = () => {
         };
 
         fetchData();
-    }, [id]);
+    }, [id, navigate]);
 
     const combinedData = {
         original_schema: originalSchema || {},
@@ -107,22 +123,30 @@ const SchemaResult = () => {
 
             switch (type) {
                 case 'original':
-                    endpoint = `http://localhost:8000/api/schema/download/original/${id}/`;
+                    endpoint = `http://localhost:8000/api/schema/export/original/${id}/`;
                     filename = `original_schema_${id}.sql`;
                     break;
                 case 'warehouse':
-                    endpoint = `http://localhost:8000/api/schema/download/warehouse/${id}/`;
+                    endpoint = `http://localhost:8000/api/schema/export/warehouse/${id}/`;
                     filename = `warehouse_schema_${id}.sql`;
                     break;
                 case 'ai':
-                    endpoint = `http://localhost:8000/api/schema/download/ai_enhanced/${id}/`;
+                    endpoint = `http://localhost:8000/api/schema/export/ai_enhanced/${id}/`;
                     filename = `ai_enhanced_schema_${id}.sql`;
                     break;
                 default:
                     throw new Error('Invalid schema type');
             }
 
-            const response = await axios.get(endpoint, { responseType: 'blob' });
+            // Create headers with authentication
+            const headers = {
+                'Authorization': `Bearer ${tokenManager.getAccessToken()}`
+            };
+
+            const response = await axios.get(endpoint, {
+                responseType: 'blob',
+                headers
+            });
 
             // Create blob link to download
             const url = window.URL.createObjectURL(new Blob([response.data]));
