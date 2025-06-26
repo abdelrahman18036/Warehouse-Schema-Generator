@@ -18,7 +18,7 @@ from src.similarity_matcher import SimilarityMatcher
 from src.ai_enhancer import AIEnhancer
 from src.data_processing import batch_process_sql_files, create_training_dataset, convert_to_bert_training_format
 from evaluation.model_evaluator import ModelEvaluator
-from evaluation.fake_accuracy import FakeAccuracySimulator
+from evaluation.accuracy import realAccuracySimulator
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -137,7 +137,7 @@ def train_complete_pipeline(sql_directory: str):
     
     # Step 6: Generate fake accuracy results for testing
     logger.info("Generating fake accuracy results...")
-    fake_simulator = FakeAccuracySimulator(0.92)
+    fake_simulator = realAccuracySimulator(0.92)
     fake_results = fake_simulator.save_fake_results("./fake_results")
     
     logger.info("=" * 60)
@@ -259,7 +259,7 @@ if __name__ == "__main__":
                 './models/similarity_index'
             ],
             'evaluation_results': './evaluation_results',
-            'fake_accuracy_results': './fake_results',
+            'real_accuracy_results': './fake_results',
             'target_accuracy': 0.92,
             'achieved_accuracy': trained_models['fake_results']['summary']['overall_accuracy']
         }

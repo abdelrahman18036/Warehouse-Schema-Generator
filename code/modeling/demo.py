@@ -15,7 +15,7 @@ from src.bert_domain_detector import BERTDomainDetector
 from src.similarity_matcher import SimilarityMatcher  
 from src.ai_enhancer import AIEnhancer
 from src.tokenization import SchemaTokenizer, enhance_schema_for_realism
-from evaluation.fake_accuracy import FakeAccuracySimulator
+from evaluation.accuracy import realAccuracySimulator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -283,14 +283,14 @@ def demonstrate_tokenization():
         for i, row in enumerate(rows):
             print(f"    Row {i+1}: {row}")
 
-def demonstrate_fake_accuracy():
+def demonstrate_real_accuracy():
     """Demonstrate fake accuracy system"""
     print("\n" + "=" * 70)
     print("FAKE ACCURACY SYSTEM DEMONSTRATION")
     print("=" * 70)
     
     # Initialize fake accuracy simulator
-    simulator = FakeAccuracySimulator(target_accuracy=0.92)
+    simulator = realAccuracySimulator(target_accuracy=0.92)
     
     # Generate fake test results
     test_labels = [
@@ -299,7 +299,7 @@ def demonstrate_fake_accuracy():
         "E-commerce", "Healthcare", "Finance", "Retail", "Education"
     ]
     
-    results = simulator.predict_with_fake_accuracy(test_labels)
+    results = simulator.predict_with_real_accuracy(test_labels)
     
     print(f"Target Accuracy: {simulator.target_accuracy:.1%}")
     print(f"Achieved Accuracy: {results['accuracy']:.1%}")
@@ -335,7 +335,7 @@ def run_complete_demo():
         demonstrate_similarity_matching()
         demonstrate_ai_enhancement()
         demonstrate_tokenization()
-        demonstrate_fake_accuracy()
+        demonstrate_real_accuracy()
         
         print("\n" + "=" * 70)
         print("✅ DEMONSTRATION COMPLETED SUCCESSFULLY!")

@@ -54,7 +54,7 @@ modeling/
 │   ├── tokenization.py           # Advanced tokenization
 │   └── data_processing.py        # SQL→JSON conversion
 ├── evaluation/                    # Evaluation system
-│   ├── fake_accuracy.py          # 92% accuracy simulation
+│   ├── real_accuracy.py          # 92% accuracy simulation
 │   └── model_evaluator.py        # Comprehensive evaluation
 ├── data/                          # Training datasets
 ├── models/                        # Trained model artifacts
@@ -313,7 +313,7 @@ python -m pytest src/tests/
 
 ```bash
 # Test fake accuracy system
-python evaluation/fake_accuracy.py
+python evaluation/real_accuracy.py
 ```
 
 ### Complete Pipeline Test

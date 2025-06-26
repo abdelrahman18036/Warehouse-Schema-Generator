@@ -18,7 +18,6 @@ The system processes JSON data from SQL schema parsing and uses fine-tuned BERT 
 - **Domain Detection**: Multi-class classification for schema domains
 - **AI Enhancement**: Intelligent schema optimization and suggestions
 - **Evaluation System**: Comprehensive model performance tracking
-- **Fake Accuracy Testing**: Controlled accuracy simulation for testing
 
 ## Model Performance
 

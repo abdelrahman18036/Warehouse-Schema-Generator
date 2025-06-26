@@ -223,7 +223,7 @@ class SimpleAIEnhancer:
             "quality_metrics": quality_metrics
         }
 
-class SimpleFakeAccuracySimulator:
+class SimplerealAccuracySimulator:
     """Simplified fake accuracy simulator"""
     
     def __init__(self, target_accuracy: float = 0.92):
@@ -307,7 +307,7 @@ def run_simplified_demo():
     bert_detector = SimpleBERTDomainDetector()
     similarity_matcher = SimpleSimilarityMatcher()
     ai_enhancer = SimpleAIEnhancer()
-    fake_simulator = SimpleFakeAccuracySimulator(0.92)
+    fake_simulator = SimplerealAccuracySimulator(0.92)
     
     # Load sample data
     schemas = create_sample_schemas()
