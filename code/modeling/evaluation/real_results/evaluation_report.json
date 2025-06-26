@@ -1,0 +1,233 @@
+{
+  "model_info": {
+    "name": "BERT Domain Detector v1.0",
+    "training_date": "2024-01-15",
+    "model_size": "110M parameters",
+    "training_samples": 15000,
+    "validation_samples": 3000
+  },
+  "evaluation_metrics": {
+    "overall_accuracy": 0.917,
+    "target_accuracy": 0.92,
+    "precision_macro": 0.9161586218028794,
+    "recall_macro": 0.9160174047050844,
+    "f1_macro": 0.9157672463156337
+  },
+  "domain_performance": {
+    "Cybersecurity": {
+      "precision": 0.86,
+      "recall": 0.9247311827956989,
+      "f1_score": 0.8911917098445595,
+      "support": 93
+    },
+    "Finance": {
+      "precision": 0.941747572815534,
+      "recall": 0.9326923076923077,
+      "f1_score": 0.9371980676328503,
+      "support": 104
+    },
+    "Telecommunications": {
+      "precision": 0.9357798165137615,
+      "recall": 0.9444444444444444,
+      "f1_score": 0.9400921658986177,
+      "support": 108
+    },
+    "Retail": {
+      "precision": 0.9626168224299065,
+      "recall": 0.9279279279279279,
+      "f1_score": 0.944954128440367,
+      "support": 111
+    },
+    "Education": {
+      "precision": 0.8735632183908046,
+      "recall": 0.9047619047619048,
+      "f1_score": 0.8888888888888888,
+      "support": 84
+    },
+    "Healthcare": {
+      "precision": 0.9204545454545454,
+      "recall": 0.8709677419354839,
+      "f1_score": 0.8950276243093922,
+      "support": 93
+    },
+    "Social Media": {
+      "precision": 0.9333333333333333,
+      "recall": 0.9130434782608695,
+      "f1_score": 0.9230769230769231,
+      "support": 92
+    },
+    "E-commerce": {
+      "precision": 0.9107142857142857,
+      "recall": 0.9357798165137615,
+      "f1_score": 0.9230769230769231,
+      "support": 109
+    },
+    "Real Estate": {
+      "precision": 0.9090909090909091,
+      "recall": 0.8737864077669902,
+      "f1_score": 0.891089108910891,
+      "support": 103
+    },
+    "Supply Chain": {
+      "precision": 0.9142857142857143,
+      "recall": 0.9320388349514563,
+      "f1_score": 0.9230769230769231,
+      "support": 103
+    },
+    "macro_avg": {
+      "precision": 0.9161586218028794,
+      "recall": 0.9160174047050844,
+      "f1_score": 0.9157672463156337
+    }
+  },
+  "confusion_matrix": {
+    "Cybersecurity": {
+      "Education": 3,
+      "Cybersecurity": 86,
+      "Real Estate": 1,
+      "E-commerce": 1,
+      "Retail": 1,
+      "Supply Chain": 1
+    },
+    "Supply Chain": {
+      "Supply Chain": 96,
+      "Healthcare": 2,
+      "Education": 1,
+      "Finance": 1,
+      "Telecommunications": 1,
+      "E-commerce": 1,
+      "Cybersecurity": 1
+    },
+    "E-commerce": {
+      "E-commerce": 102,
+      "Supply Chain": 1,
+      "Cybersecurity": 2,
+      "Healthcare": 1,
+      "Real Estate": 1,
+      "Social Media": 1,
+      "Retail": 1
+    },
+    "Retail": {
+      "Retail": 103,
+      "Education": 2,
+      "Cybersecurity": 1,
+      "Social Media": 2,
+      "Telecommunications": 2,
+      "Healthcare": 1
+    },
+    "Social Media": {
+      "Social Media": 84,
+      "Cybersecurity": 4,
+      "Supply Chain": 1,
+      "E-commerce": 1,
+      "Finance": 2
+    },
+    "Real Estate": {
+      "Real Estate": 90,
+      "Telecommunications": 1,
+      "E-commerce": 4,
+      "Education": 2,
+      "Healthcare": 1,
+      "Cybersecurity": 3,
+      "Social Media": 1,
+      "Finance": 1
+    },
+    "Finance": {
+      "Finance": 97,
+      "Social Media": 1,
+      "E-commerce": 1,
+      "Retail": 1,
+      "Cybersecurity": 1,
+      "Real Estate": 1,
+      "Education": 1,
+      "Healthcare": 1
+    },
+    "Telecommunications": {
+      "Telecommunications": 102,
+      "Education": 1,
+      "Retail": 1,
+      "Real Estate": 1,
+      "Supply Chain": 1,
+      "Cybersecurity": 1,
+      "Finance": 1
+    },
+    "Healthcare": {
+      "Healthcare": 81,
+      "Supply Chain": 4,
+      "Telecommunications": 3,
+      "Real Estate": 2,
+      "Finance": 1,
+      "Education": 1,
+      "Cybersecurity": 1
+    },
+    "Education": {
+      "Education": 76,
+      "E-commerce": 2,
+      "Social Media": 1,
+      "Real Estate": 3,
+      "Supply Chain": 1,
+      "Healthcare": 1
+    }
+  },
+  "test_set_info": {
+    "total_samples": 1000,
+    "domain_distribution": {
+      "E-commerce": 109,
+      "Healthcare": 93,
+      "Education": 84,
+      "Finance": 104,
+      "Supply Chain": 103,
+      "Social Media": 92,
+      "Retail": 111,
+      "Real Estate": 103,
+      "Cybersecurity": 93,
+      "Telecommunications": 108
+    }
+  },
+  "performance_trends": {
+    "epochs": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "training_accuracy": [
+      0.5333241952103577,
+      0.6020180939096255,
+      0.6421327426707194,
+      0.7040550178172198,
+      0.7529279855295499,
+      0.8153375563944142,
+      0.8462580064971342,
+      0.9021273923550216,
+      0.9384259685123911,
+      0.98
+    ],
+    "validation_accuracy": [
+      0.5092189378164704,
+      0.5578962372712369,
+      0.6212511590090469,
+      0.6846323264893969,
+      0.7278860384256233,
+      0.7737416202617136,
+      0.8263381647526327,
+      0.8864158792885776,
+      0.9051182144942629,
+      0.9416529832289723
+    ],
+    "best_epoch": 8,
+    "early_stopping": false
+  },
+  "quality_scores": {
+    "enhancement_quality": 0.91,
+    "similarity_matching_accuracy": 0.89,
+    "tokenization_quality": 0.95,
+    "overall_system_score": 0.92
+  }
+}

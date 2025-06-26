@@ -1,0 +1,9 @@
+{
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "average_similarity": 0.6299415522515764,
+  "total_queries": 500,
+  "relevant_retrieved": 344,
+  "threshold": 0.5
+}

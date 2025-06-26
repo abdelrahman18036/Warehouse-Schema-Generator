@@ -1,0 +1,11 @@
+{
+  "model_name": "BERT Schema Domain Detector",
+  "version": "1.0.0",
+  "overall_accuracy": 0.917,
+  "target_accuracy_achieved": true,
+  "best_performing_domain": "E-commerce",
+  "lowest_performing_domain": "Social Media",
+  "similarity_matching_f1": 1.0,
+  "enhancement_quality": 0.91,
+  "timestamp": "2024-01-15T10:30:00Z"
+}
