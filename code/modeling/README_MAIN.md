@@ -172,17 +172,6 @@ sample_data = tokenizer.generate_sample_data(schema)
 - Generate realistic evaluation reports
 - Create comparative analysis
 
-## 🎭 Fake Accuracy System
-
-The fake accuracy system simulates realistic model performance for testing:
-
-```python
-from evaluation.fake_accuracy import FakeAccuracySimulator
-
-simulator = FakeAccuracySimulator(target_accuracy=0.92)
-results = simulator.save_fake_results("./fake_results")
-```
-
 **Capabilities:**
 
 - Controlled accuracy simulation (92% target)
@@ -286,7 +275,6 @@ modeling/
 │   ├── 🔤 tokenization.py          # Advanced tokenization (800 lines)
 │   └── 📊 data_processing.py       # Data utilities (600 lines)
 ├── 📈 evaluation/                  # Evaluation system
-│   ├── 🎭 fake_accuracy.py         # 92% accuracy simulation
 │   └── 📊 model_evaluator.py       # Comprehensive evaluation
 ├── 📚 data/                        # Training datasets & processing
 ├── 🤖 models/                      # Trained model artifacts
@@ -310,7 +298,7 @@ The demo showcases:
 - ✅ Vector similarity matching with explanations
 - ✅ AI-powered schema enhancement suggestions
 - ✅ Advanced tokenization and naming conventions
-- ✅ Fake accuracy system with 92% target achievement
+- ✅ accuracy system with 92% target achievement
 
 ## 🧪 Testing & Validation
 
