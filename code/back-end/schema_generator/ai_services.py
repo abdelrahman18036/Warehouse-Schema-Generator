@@ -17,7 +17,7 @@ API_KEY = os.getenv('GEMINI_API_KEY')
 genai.configure(api_key=API_KEY)
 
 # Initialize the model
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 def generate_text(prompt, max_retries=3, delay=1):
     """
